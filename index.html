@@ -230,6 +230,22 @@
       "5": 11200
     };
 
+    document.addEventListener('touchstart', function(e) {
+      if (!e.target.closest('input, select, button')) {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      }
+    }, { passive: true });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('input, select, button')) {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+      }
+    });
+
     function calculateSum() {
       const countVal = document.getElementById('count').value;
       const sumInput = document.getElementById('sum');
