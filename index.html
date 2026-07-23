@@ -136,6 +136,29 @@
       pointer-events: none;
     }
 
+    .stats-row {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hint-color);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .stats-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--button-color);
+    }
+
     .submit-btn {
       width: 100%;
       height: 52px;
@@ -204,6 +227,11 @@
       <div class="input-wrapper">
         <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
       </div>
+    </div>
+
+    <div class="stats-row">
+      <span class="stats-title">Записано за 24ч</span>
+      <span class="stats-value" id="stats24h">0 ₽</span>
     </div>
   </div>
 
@@ -279,6 +307,18 @@
 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxePTw-LBYeoBvDwXPli74y5x-HgWIwRVUaKDT0QX1O2yt4bZVi0s2nfIdIVbm1E8K3/exec";
 
+    async function load24hTotal() {
+      try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        if (data && data.total24h !== undefined) {
+          document.getElementById('stats24h').innerText = data.total24h.toLocaleString('ru-RU') + ' ₽';
+        }
+      } catch (e) {}
+    }
+
+    load24hTotal();
+
     async function sendData() {
       const count = document.getElementById('count').value;
       const sum = document.getElementById('sum').value;
@@ -317,6 +357,7 @@
         btn.innerText = "Закрыть";
         btn.disabled = false;
         isSubmitted = true;
+        setTimeout(load24hTotal, 1200);
       } catch (e) {
         statusDiv.style.color = "#ff3b30";
         statusDiv.innerText = "Ошибка: " + e.message;
