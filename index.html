@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #000); }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: var(--tg-theme-button-color, #2481cc); color: var(--tg-theme-button-text-color, #fff); border: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Учет товара</h2>
+  <input type="number" id="count" placeholder="Количество товара (шт)">
+  <input type="number" id="sum" placeholder="Сумма (₽)">
+  <input type="text" id="comment" placeholder="Комментарий">
+  <button onclick="sendData()">Сохранить</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const SCRIPT_URL = "СЮДА_ВСТАВЬТЕ_URL_ИЗ_APPS_SCRIPT";
+
+    async function sendData() {
+      const count = document.getElementById('count').value;
+      const sum = document.getElementById('sum').value;
+      const comment = document.getElementById('comment').value;
+
+      if (!count || !sum) {
+        alert('Заполните количество и сумму!');
+        return;
+      }
+
+      tg.MainButton.setText("Сохранение...").show();
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count, sum, comment })
+      });
+
+      tg.MainButton.hide();
+      tg.close();
+    }
+  </script>
+</body>
+</html>
