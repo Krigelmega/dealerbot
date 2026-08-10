@@ -1,18 +1,193 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Учёт товара</title>
-  
+ <title>Учёт товара</title>
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+  
   <link rel="stylesheet" href="styles.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #f4f4f7);
+      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --text-color: var(--tg-theme-text-color, #1c1c1e);
+      --hint-color: var(--tg-theme-hint-color, #8e8e93);
+      --button-color: var(--tg-theme-button-color, #007aff);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --border-color: rgba(60, 60, 67, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      margin-top: 8px;
+    }
+
+    .header-icon {
+      font-size: 44px;
+      margin-bottom: 4px;
+      display: inline-block;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--hint-color);
+      margin: 4px 0 0 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hint-color);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    select, input {
+      width: 100%;
+      height: 50px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-color);
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--button-color);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    }
+
+    .select-wrapper::after {
+      content: "›";
+      font-size: 22px;
+      color: var(--hint-color);
+      position: absolute;
+      right: 16px;
+      pointer-events: none;
+      transform: rotate(90deg);
+      font-weight: 300;
+    }
+
+    .currency-symbol {
+      position: absolute;
+      right: 16px;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--hint-color);
+      pointer-events: none;
+    }
+
+    .stats-row {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hint-color);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .stats-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--button-color);
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 52px;
+      background-color: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+      transition: transform 0.1s ease, opacity 0.2s ease;
+      margin-top: auto;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="header-icon">
+    <div class="header-icon">📦</div>
       <a href="https://docs.google.com/spreadsheets/d/1KmMul8xo0rvzvxRPfrCjhxJiajeN0wx9haD2q116QBw/edit?gid=0#gid=0" target="_blank" rel="noopener" style="text-decoration: none;">📦</a>
     </div>
     <h1>Учёт товара</h1>
