@@ -1,7 +1,9 @@
+// functions/api/[[route]].js
+
 const store = {
-    challenges: {},    // { username: challenge }
-    users: {},         // { username: userData }
-    sessions: {}       // { token: username }
+    challenges: {},
+    users: {},
+    sessions: {}
 };
 
 export async function onRequest(context) {
@@ -28,17 +30,18 @@ export async function onRequest(context) {
             const challenge = new Uint8Array(32);
             crypto.getRandomValues(challenge);
             
-            // Сохраняем в памяти
-            store.challenges[username] = btoa(String.fromCharCode(...challenge));
+            // Сохраняем в памяти как строку
+            store.challenges[username] = Array.from(challenge);
             
+            // Отправляем challenge как массив чисел, а не base64
             const options = {
-                challenge: btoa(String.fromCharCode(...challenge)),
+                challenge: Array.from(challenge),
                 rp: {
                     name: "DealerBot",
                     id: url.hostname
                 },
                 user: {
-                    id: btoa(username),
+                    id: Array.from(new TextEncoder().encode(username)),
                     name: username,
                     displayName: username
                 },
@@ -71,7 +74,6 @@ export async function onRequest(context) {
             const data = await request.json();
             const { username, id, response } = data;
             
-            // Проверяем challenge
             if (!store.challenges[username]) {
                 return new Response(JSON.stringify({ error: 'Challenge expired' }), {
                     status: 400,
@@ -79,7 +81,6 @@ export async function onRequest(context) {
                 });
             }
             
-            // Сохраняем пользователя
             store.users[username] = {
                 credentialId: id,
                 publicKey: response.attestationObject,
@@ -114,14 +115,14 @@ export async function onRequest(context) {
             const challenge = new Uint8Array(32);
             crypto.getRandomValues(challenge);
             
-            store.challenges[username] = btoa(String.fromCharCode(...challenge));
+            store.challenges[username] = Array.from(challenge);
             
             const options = {
-                challenge: btoa(String.fromCharCode(...challenge)),
+                challenge: Array.from(challenge),
                 rpId: url.hostname,
                 allowCredentials: [{
                     type: "public-key",
-                    id: store.users[username].credentialId
+                    id: Array.from(new TextEncoder().encode(store.users[username].credentialId))
                 }],
                 userVerification: "required",
                 timeout: 60000
@@ -151,10 +152,9 @@ export async function onRequest(context) {
                 });
             }
             
-            // Генерируем сессионный токен
             const sessionToken = new Uint8Array(32);
             crypto.getRandomValues(sessionToken);
-            const token = btoa(String.fromCharCode(...sessionToken));
+            const token = Array.from(sessionToken).join('');
             store.sessions[token] = username;
             
             delete store.challenges[username];
