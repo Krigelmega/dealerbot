@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Учёт товара</title>
+  <title>Учёт товара и Расчёт P2P</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -34,21 +34,59 @@
       min-height: 100vh;
     }
 
+    /* Навигация между страницами */
+    .nav-tabs {
+      display: flex;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .nav-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--hint-color);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab.active {
+      background-color: var(--button-color);
+      color: var(--button-text);
+      box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+    }
+
+    .page {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
     .header {
       text-align: center;
-      margin-bottom: 24px;
-      margin-top: 8px;
+      margin-bottom: 20px;
+      margin-top: 4px;
     }
 
     .header-icon {
-      font-size: 44px;
+      font-size: 40px;
       margin-bottom: 4px;
       display: inline-block;
       animation: pulse 2s infinite ease-in-out;
     }
 
     .header h1 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       margin: 0;
       letter-spacing: -0.5px;
@@ -69,7 +107,7 @@
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       position: relative;
     }
 
@@ -77,9 +115,19 @@
       margin-bottom: 0;
     }
 
+    /* Двойные поля в ряд */
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--hint-color);
       margin-bottom: 6px;
@@ -95,12 +143,12 @@
 
     select, input {
       width: 100%;
-      height: 50px;
+      height: 48px;
       background-color: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 0 16px;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 500;
       color: var(--text-color);
       outline: none;
@@ -128,15 +176,15 @@
     .currency-symbol {
       position: absolute;
       right: 16px;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 500;
       color: var(--hint-color);
       pointer-events: none;
     }
 
     .stats-row {
-      margin-top: 16px;
-      padding-top: 14px;
+      margin-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -144,7 +192,7 @@
     }
 
     .stats-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--hint-color);
       text-transform: uppercase;
@@ -152,7 +200,7 @@
     }
 
     .stats-value {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--button-color);
     }
@@ -186,65 +234,146 @@
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-icon">
-      <a href="https://docs.google.com/spreadsheets/d/1KmMul8xo0rvzvxRPfrCjhxJiajeN0wx9haD2q116QBw/edit?gid=0#gid=0" target="_blank" rel="noopener" style="text-decoration: none;">📦</a>
-    </div>
-    <h1>Учёт товара</h1>
-    <p>Быстрая запись продаж</p>
+  <!-- Переключатель страниц -->
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchPage(1)">Учёт товара</div>
+    <div class="nav-tab" onclick="switchPage(2)">Калькулятор P2P</div>
   </div>
 
-  <div class="card">
-    <div class="form-group">
-      <label for="count">Количество товара</label>
-      <div class="input-wrapper select-wrapper">
-        <select id="count" onchange="onCountChange()">
-          <option value="" disabled selected>Выберите объем...</option>
-          <option value="0.5">0.5 g</option>
-          <option value="1">1 g</option>
-          <option value="1.5">1.5 g</option>
-          <option value="2">2 g</option>
-          <option value="2.5">2.5 g</option>
-          <option value="3">3 g</option>
-          <option value="3.5">3.5 g</option>
-          <option value="4">4 g</option>
-          <option value="4.5">4.5 g</option>
-          <option value="5">5 g</option>
-        </select>
+  <!-- СТРАНИЦА 1: Учёт товара -->
+  <div id="page1" class="page active">
+    <div class="header">
+      <div class="header-icon">
+        <a href="https://docs.google.com/spreadsheets/d/1KmMul8xo0rvzvxRPfrCjhxJiajeN0wx9haD2q116QBw/edit?gid=0#gid=0" target="_blank" rel="noopener" style="text-decoration: none;">📦</a>
+      </div>
+      <h1>Учёт товара</h1>
+      <p>Быстрая запись продаж</p>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label for="count">Количество товара</label>
+        <div class="input-wrapper select-wrapper">
+          <select id="count" onchange="onCountChange()">
+            <option value="" disabled selected>Выберите объем...</option>
+            <option value="0.5">0.5 g</option>
+            <option value="1">1 g</option>
+            <option value="1.5">1.5 g</option>
+            <option value="2">2 g</option>
+            <option value="2.5">2.5 g</option>
+            <option value="3">3 g</option>
+            <option value="3.5">3.5 g</option>
+            <option value="4">4 g</option>
+            <option value="4.5">4.5 g</option>
+            <option value="5">5 g</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sum">Сумма к оплате</label>
+        <div class="input-wrapper">
+          <input type="number" id="sum" placeholder="0" inputmode="numeric" oninput="resetSubmitState()">
+          <span class="currency-symbol">₽</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="comment">Комментарий</label>
+        <div class="input-wrapper">
+          <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <span class="stats-title">Записано за 24ч</span>
+        <span class="stats-value" id="stats24h">0 ₽</span>
+      </div>
+      <div class="stats-row">
+        <span class="stats-title">Прибыль за сегодня</span>
+        <span class="stats-value" id="statsProfit">0 ₽</span>
+      </div>
+      <div class="stats-row">
+        <span class="stats-title">Количество за сегодня</span>
+        <span class="stats-value" id="statsCount">0 g</span>
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="sum">Сумма к оплате</label>
-      <div class="input-wrapper">
-        <input type="number" id="sum" placeholder="0" inputmode="numeric" oninput="resetSubmitState()">
-        <span class="currency-symbol">₽</span>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="comment">Комментарий</label>
-      <div class="input-wrapper">
-        <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <span class="stats-title">Записано за 24ч</span>
-      <span class="stats-value" id="stats24h">0 ₽</span>
-    </div>
-    <div class="stats-row">
-      <span class="stats-title">Прибыль за сегодня</span>
-      <span class="stats-value" id="statsProfit">0 ₽</span>
-    </div>
-    <div class="stats-row">
-      <span class="stats-title">Количество за сегодня</span>
-      <span class="stats-value" id="statsCount">0 g</span>
-    </div>
+    <div id="status" style="margin-bottom: 15px; font-size: 14px; text-align: center; color: #ff9500; font-weight: 600;"></div>
+    <button class="submit-btn" onclick="handleButtonClick()">Сохранить запись</button>
   </div>
 
-  <div id="status" style="margin-bottom: 15px; font-size: 14px; text-align: center; color: #ff9500; font-weight: 600;"></div>
-  <button class="submit-btn" onclick="handleButtonClick()">Сохранить запись</button>
+  <!-- СТРАНИЦА 2: Калькулятор P2P -->
+  <div id="page2" class="page">
+    <div class="header">
+      <div class="header-icon">💱</div>
+      <h1>Калькулятор P2P</h1>
+      <p>Расчет спреда и курсов</p>
+    </div>
+
+    <div class="card">
+      <!-- Верхние 2 поля: курс покупки и курс продажи -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="p2pBuyRate">Курс покупки</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="p2pSellRate">Курс продажи</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Сумма в рублях -->
+      <div class="form-group">
+        <label for="p2pSumRub">Сумма в рублях</label>
+        <div class="input-wrapper">
+          <input type="number" id="p2pSumRub" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+          <span class="currency-symbol">₽</span>
+        </div>
+      </div>
+
+      <!-- Сумма в USDT (сумм в руб / курс продажи) -->
+      <div class="form-group">
+        <label for="p2pSumUsdt">Сумма в USDT</label>
+        <div class="input-wrapper">
+          <input type="number" step="0.01" id="p2pSumUsdt" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+          <span class="currency-symbol">$</span>
+        </div>
+      </div>
+
+      <!-- Сумма, которая спишется (Сумм в руб / курс продажи - Сумм в USDT) -->
+      <div class="form-group">
+        <label for="p2pWillSettle">Спишется</label>
+        <div class="input-wrapper">
+          <input type="number" step="0.01" id="p2pWillSettle" placeholder="0" readonly style="opacity: 0.8;">
+          <span class="currency-symbol">$</span>
+        </div>
+      </div>
+
+      <!-- Прибыль и Оставить партнерам -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="p2pProfit">Прибыль</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.01" id="p2pProfit" placeholder="0" readonly style="opacity: 0.8;">
+            <span class="currency-symbol">$</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="p2pPartner">Оставить партнерам</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.01" id="p2pPartner" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+            <span class="currency-symbol">$</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
   const tg = window.Telegram.WebApp;
@@ -265,6 +394,15 @@
     "4.5": 10200,
     "5": 11200
   };
+
+  // Переключение страниц
+  function switchPage(pageNum) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+    document.getElementById('page' + pageNum).classList.add('active');
+    document.querySelectorAll('.nav-tab')[pageNum - 1].classList.add('active');
+  }
 
   document.addEventListener('touchstart', function(e) {
     if (!e.target.closest('input, select, button')) {
@@ -394,6 +532,29 @@
       btn.innerText = "Сохранить запись";
       btn.disabled = false;
     }
+  }
+
+  // Логика расчетов для второй страницы (P2P Калькулятор)
+  function calculateP2P() {
+    const buyRate = parseFloat(document.getElementById('p2pBuyRate').value) || 0;
+    const sellRate = parseFloat(document.getElementById('p2pSellRate').value) || 0;
+    const sumRub = parseFloat(document.getElementById('p2pSumRub').value) || 0;
+    const sumUsdt = parseFloat(document.getElementById('p2pSumUsdt').value) || 0;
+    const partnerAmount = parseFloat(document.getElementById('p2pPartner').value) || 0;
+
+    // Сумма в USDT = сумм в руб / курс продажи
+    const calculatedUsdt = sellRate > 0 ? sumRub / sellRate : 0;
+    document.getElementById('p2pSumUsdt').value = calculatedUsdt ? calculatedUsdt.toFixed(2) : '';
+
+    // Спишется = (сумм в руб / курс продажи) - сумма в usdt
+    const willSettle = calculatedUsdt - sumUsdt;
+    document.getElementById('p2pWillSettle').value = willSettle ? willSettle.toFixed(2) : '';
+
+    // Прибыль = ((курьер/курс покупки - курс продажи) или расчет через спред)
+    // Формула прибыли: (сумм в руб / курс покупки) - (сумм в руб / курс продажи) - партнерские
+    const baseUsdtBuy = buyRate > 0 ? sumRub / buyRate : 0;
+    const profit = baseUsdtBuy > 0 ? (baseUsdtBuy - calculatedUsdt - partnerAmount) : 0;
+    document.getElementById('p2pProfit').value = profit ? profit.toFixed(2) : '';
   }
 </script>
 </body>
