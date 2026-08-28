@@ -561,13 +561,8 @@
 
   // ============ АВТОРИЗАЦИЯ С WEBATHN ============
 
-  function base64ToUint8Array(base64) {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
+  function arrayToUint8Array(arr) {
+    return new Uint8Array(arr);
 }
   
   // Проверяем сессию
@@ -618,8 +613,8 @@
       
       const options = await beginResponse.json();
 
-      options.challenge = base64ToUint8Array(options.challenge);
-      options.user.id = base64ToUint8Array(options.user.id);
+      options.challenge = new Uint8Array(options.challenge);
+      options.user.id = new Uint8Array(options.user.id);
       
       // 2. Создаем ключ через WebAuthn (запускает Face ID)
       statusEl.textContent = '📱 Подтвердите Face ID...';
@@ -704,10 +699,10 @@
     const options = await beginResponse.json();
     
     // Преобразуем challenge из base64
-    options.challenge = base64ToUint8Array(options.challenge);
+    options.challenge = new Uint8Array(options.challenge);
     options.allowCredentials = options.allowCredentials.map(cred => ({
     ...cred,
-    id: base64ToUint8Array(cred.id)
+    id: new Uint8Array(cred.id)
 }));
     
     // 2. Запрашиваем подтверждение через WebAuthn (запускает Face ID)
