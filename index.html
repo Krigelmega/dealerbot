@@ -96,13 +96,6 @@
       transform: scale(0.98);
       opacity: 0.9;
     }
-    .auth-btn.secondary {
-      background-color: transparent;
-      color: var(--hint-color);
-      box-shadow: none;
-      font-size: 14px;
-      height: 40px;
-    }
     .auth-password-input {
       width: 100%;
       height: 48px;
@@ -464,32 +457,25 @@
     </div>
   </div>
   <script>
-  const tg = window.Telegram.WebApp;
+  const tg=window.Telegram.WebApp;
   tg.ready();
   tg.expand();
 
-  function p(q){return String.fromCharCode(q-1)}function x(a,b){return a^b}function y(s){return s.split('').reverse().join('')}function z(s){return parseInt(s)}
-  const _0x3f2a=['Nzg3NA==','7874','4787','4473','1491','2209'];
-  function decrypt(){
-    let a=atob(_0x3f2a[0]);
-    a=y(a);
-    a=z(a)-314;
+  function d1(a){return String.fromCharCode(a-1)}
+  function d2(a,b){return a^b}
+  function d3(s){return s.split('').reverse().join('')}
+  function d4(s){return parseInt(s)}
+  
+  const _a=['Nzg3NA==','7874','4787','4473','1491','2209'];
+  function getCode(){
+    let a=atob(_a[0]);
+    a=d3(a);
+    a=d4(a)-314;
     a=a/3;
-    a=x(a,1234);
+    a=d2(a,1234);
     return a.toString();
   }
-  const AUTH_PASSWORD=decrypt();
-
-  function checkAuth(){
-    const d=localStorage.getItem('authData');
-    if(d){
-      try{
-        const e=JSON.parse(d);
-        if(e.authenticated&&e.timestamp>Date.now()-86400000)return true;
-      }catch(e){return false}
-    }
-    return false;
-  }
+  const CODE=getCode();
 
   function unlockApp(){
     document.getElementById('authOverlay').classList.add('hidden');
@@ -501,25 +487,17 @@
     const inp=document.getElementById('authPassword');
     const st=document.getElementById('authStatus');
     const val=inp.value.trim();
-    if(val===AUTH_PASSWORD){
-      localStorage.setItem('authData',JSON.stringify({authenticated:true,timestamp:Date.now()}));
-      st.textContent='✅ Успешный вход!';
+    if(val===CODE){
+      st.textContent='✅';
       st.className='auth-status success';
-      setTimeout(unlockApp,500);
+      setTimeout(unlockApp,300);
     }else{
-      st.textContent='❌ Неверный код!';
+      st.textContent='❌';
       st.className='auth-status error';
       inp.value='';
       inp.focus();
       tg.HapticFeedback.notificationOccurred('error');
     }
-  }
-
-  function initAuth(){
-    if(checkAuth()){unlockApp();return}
-    document.getElementById('authOverlay').classList.remove('hidden');
-    document.getElementById('mainContent').classList.remove('unlocked');
-    setTimeout(()=>document.getElementById('authPassword').focus(),300);
   }
 
   let isSubmitted=false;
@@ -702,10 +680,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    initAuth();
     document.getElementById('authPassword').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handlePasswordLogin();
+      if(e.key==='Enter')handlePasswordLogin();
     });
+    setTimeout(()=>document.getElementById('authPassword').focus(),300);
   });
   </script>
 </body>
