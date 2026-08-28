@@ -627,10 +627,10 @@
       partnerEl.value = partner ? partner.toFixed(2) : '';
     }
 
-    const buyUsdt = (buyRate > 0) ? sumRub / buyRate : 0;
-  const spreadProfit = (buyUsdt > 0 && sellRate > 0) ? buyUsdt * (sellRate - buyRate) : 0;
-  courseProfit = profit + spreadProfit;
-  courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
+    const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
+    const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
+    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((sumUsdt + (sumUsdt * 0.06)) * sellRate) : 0;
+    courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
     if (source !== 'finalBalance') {
       finalBalance = (sumUsdt > 0 && sellRate > 0) ? (sumUsdt + (sumUsdt * 0.06)) * sellRate : 0;
