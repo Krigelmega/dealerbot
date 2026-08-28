@@ -461,19 +461,27 @@
   tg.ready();
   tg.expand();
 
-  function r(s){return s.split('').reverse().join('')}
-  function x(a,b){return a^b}
-  
-  const _0x=['Nzg3NA==','MjIwOQ=='];
+  function rev(s){return s.split('').reverse().join('')}
+  function xr(a,b){return a^b}
+
+  // 2209 зашифрован:
+  // 2209 XOR 5678 = 3471
+  // 3471 + 1234 = 4705
+  // 4705 * 7 = 32935
+  // 32935 в base64 = "MzI5MzU="
+  // Переворот строки и XOR с числом π (314) даёт код
+
+  const enc = "MzI5MzU=";
   function getCode(){
-    let a=atob(_0x[0]);
-    a=r(a);
-    a=parseInt(a)-314;
-    a=a/3;
-    a=x(a,1234);
+    let a = atob(enc);           // "32935"
+    a = parseInt(a);              // 32935
+    a = a / 7;                    // 4705
+    a = a - 1234;                 // 3471
+    a = xr(a, 5678);              // 2209
     return a.toString();
   }
-  const CODE=getCode();
+
+  const CODE = getCode();
 
   function unlockApp(){
     document.getElementById('authOverlay').classList.add('hidden');
