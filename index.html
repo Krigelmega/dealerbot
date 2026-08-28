@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Учёт товара и Расчёт P2P</title>
-  
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -17,12 +16,10 @@
       --button-text: var(--tg-theme-button-text-color, #ffffff);
       --border-color: rgba(60, 60, 67, 0.12);
     }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
       background-color: var(--bg-color);
@@ -33,7 +30,6 @@
       flex-direction: column;
       min-height: 100vh;
     }
-
     .auth-overlay {
       position: fixed;
       top: 0;
@@ -49,12 +45,10 @@
       z-index: 9999;
       transition: opacity 0.5s ease;
     }
-
     .auth-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
-
     .auth-card {
       background: var(--card-bg);
       border-radius: 24px;
@@ -65,30 +59,25 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       animation: slideUp 0.4s ease;
     }
-
     @keyframes slideUp {
       from { transform: translateY(30px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-
     .auth-icon {
       font-size: 64px;
       margin-bottom: 12px;
       display: block;
     }
-
     .auth-title {
       font-size: 22px;
       font-weight: 700;
       margin: 0 0 8px 0;
     }
-
     .auth-subtitle {
       font-size: 14px;
       color: var(--hint-color);
       margin: 0 0 24px 0;
     }
-
     .auth-btn {
       width: 100%;
       height: 52px;
@@ -103,12 +92,10 @@
       transition: transform 0.1s ease, opacity 0.2s ease;
       margin-bottom: 12px;
     }
-
     .auth-btn:active {
       transform: scale(0.98);
       opacity: 0.9;
     }
-
     .auth-btn.secondary {
       background-color: transparent;
       color: var(--hint-color);
@@ -116,7 +103,6 @@
       font-size: 14px;
       height: 40px;
     }
-
     .auth-password-input {
       width: 100%;
       height: 48px;
@@ -132,27 +118,22 @@
       text-align: center;
       letter-spacing: 4px;
     }
-
     .auth-password-input:focus {
       border-color: var(--button-color);
       box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
     }
-
     .auth-status {
       font-size: 13px;
       color: var(--hint-color);
       margin-top: 12px;
       min-height: 20px;
     }
-
     .auth-status.error {
       color: #ff3b30;
     }
-
     .auth-status.success {
       color: #34c759;
     }
-
     .nav-tabs {
       display: flex;
       background: var(--card-bg);
@@ -161,7 +142,6 @@
       margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
-
     .nav-tab {
       flex: 1;
       text-align: center;
@@ -173,49 +153,41 @@
       border-radius: 10px;
       transition: all 0.2s ease;
     }
-
     .nav-tab.active {
       background-color: var(--button-color);
       color: var(--button-text);
       box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
     }
-
     .page {
       display: none;
       flex-direction: column;
       flex: 1;
     }
-
     .page.active {
       display: flex;
     }
-
     .header {
       text-align: center;
       margin-bottom: 20px;
       margin-top: 4px;
     }
-
     .header-icon {
       font-size: 40px;
       margin-bottom: 4px;
       display: inline-block;
       animation: pulse 2s infinite ease-in-out;
     }
-
     .header h1 {
       font-size: 20px;
       font-weight: 700;
       margin: 0;
       letter-spacing: -0.5px;
     }
-
     .header p {
       font-size: 13px;
       color: var(--hint-color);
       margin: 4px 0 0 0;
     }
-
     .card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -223,25 +195,20 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
       margin-bottom: 20px;
     }
-
     .form-group {
       margin-bottom: 14px;
       position: relative;
     }
-
     .form-group:last-child {
       margin-bottom: 0;
     }
-
     .form-row {
       display: flex;
       gap: 10px;
     }
-
     .form-row .form-group {
       flex: 1;
     }
-
     label {
       display: block;
       font-size: 11px;
@@ -251,13 +218,11 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-
     .input-wrapper {
       position: relative;
       display: flex;
       align-items: center;
     }
-
     select, input {
       width: 100%;
       height: 48px;
@@ -273,12 +238,10 @@
       appearance: none;
       -webkit-appearance: none;
     }
-
     select:focus, input:focus {
       border-color: var(--button-color);
       box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
     }
-
     .select-wrapper::after {
       content: "›";
       font-size: 22px;
@@ -289,7 +252,6 @@
       transform: rotate(90deg);
       font-weight: 300;
     }
-
     .currency-symbol {
       position: absolute;
       right: 16px;
@@ -298,7 +260,6 @@
       color: var(--hint-color);
       pointer-events: none;
     }
-
     .stats-row {
       margin-top: 14px;
       padding-top: 12px;
@@ -307,7 +268,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .stats-title {
       font-size: 12px;
       font-weight: 600;
@@ -315,13 +275,11 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-
     .stats-value {
       font-size: 16px;
       font-weight: 700;
       color: var(--button-color);
     }
-
     .submit-btn {
       width: 100%;
       height: 52px;
@@ -336,24 +294,20 @@
       transition: transform 0.1s ease, opacity 0.2s ease;
       margin-top: auto;
     }
-
     .submit-btn:active {
       transform: scale(0.98);
       opacity: 0.9;
     }
-
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-
     .main-content {
       opacity: 0.3;
       pointer-events: none;
       transition: opacity 0.5s ease;
     }
-
     .main-content.unlocked {
       opacity: 1;
       pointer-events: auto;
@@ -361,48 +315,21 @@
   </style>
 </head>
 <body>
-
-  <!-- ЭКРАН АВТОРИЗАЦИИ -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      <span class="auth-icon" id="authIcon">🔐</span>
-      <h2 class="auth-title" id="authTitle">Вход в систему</h2>
-      <p class="auth-subtitle" id="authSubtitle">Используйте Face ID для быстрого доступа</p>
-      
-      <!-- Поле для имени пользователя -->
-      <div class="form-group">
-        <input type="text" id="authUsername" placeholder="Введите имя пользователя" style="width: 100%; height: 48px; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 0 16px; font-size: 16px; font-weight: 500; color: var(--text-color); outline: none;">
-      </div>
-      
-      <button class="auth-btn" id="authMainBtn" onclick="handleAuth()">
-        <span id="authBtnText">🔓 Войти с Face ID</span>
-      </button>
-      
-      <!-- Кнопка регистрации (первый раз) -->
-      <button class="auth-btn secondary" onclick="registerFaceID()" style="margin-bottom: 12px;">
-        📝 Зарегистрировать Face ID
-      </button>
-      
-      <div id="passwordSection" style="display: none;">
-        <input type="password" class="auth-password-input" id="authPassword" placeholder="Введите код" maxlength="6" inputmode="numeric">
-        <button class="auth-btn" onclick="handlePasswordLogin()">Войти по коду</button>
-      </div>
-      
-      <button class="auth-btn secondary" id="authSecondaryBtn" onclick="togglePasswordMode()">
-        Ввести код доступа
-      </button>
-      
+      <span class="auth-icon" id="authIcon">🔑</span>
+      <h2 class="auth-title">Вход в систему</h2>
+      <p class="auth-subtitle" id="authSubtitle">Введите код доступа</p>
+      <input type="password" class="auth-password-input" id="authPassword" placeholder="Введите код" maxlength="6" inputmode="numeric">
+      <button class="auth-btn" onclick="handlePasswordLogin()">Войти</button>
       <div class="auth-status" id="authStatus"></div>
     </div>
   </div>
-
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
   <div class="main-content" id="mainContent">
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="switchPage(1)">Deals</div>
       <div class="nav-tab" onclick="switchPage(2)">Processing</div>
     </div>
-
     <div id="page1" class="page active">
       <div class="header">
         <div class="header-icon">
@@ -411,7 +338,6 @@
         <h1>Учёт товара</h1>
         <p>Быстрая запись продаж</p>
       </div>
-
       <div class="card">
         <div class="form-group">
           <label for="count">Количество товара</label>
@@ -431,7 +357,6 @@
             </select>
           </div>
         </div>
-
         <div class="form-group">
           <label for="sum">Сумма к оплате</label>
           <div class="input-wrapper">
@@ -439,14 +364,12 @@
             <span class="currency-symbol">₽</span>
           </div>
         </div>
-
         <div class="form-group">
           <label for="comment">Комментарий</label>
           <div class="input-wrapper">
             <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
           </div>
         </div>
-
         <div class="stats-row">
           <span class="stats-title">Записано за 24ч</span>
           <span class="stats-value" id="stats24h">0 ₽</span>
@@ -460,18 +383,15 @@
           <span class="stats-value" id="statsCount">0 g</span>
         </div>
       </div>
-
       <div id="status" style="margin-bottom: 15px; font-size: 14px; text-align: center; color: #ff9500; font-weight: 600;"></div>
       <button class="submit-btn" onclick="handleButtonClick()">Сохранить запись</button>
     </div>
-
     <div id="page2" class="page">
       <div class="header">
         <div class="header-icon">💱</div>
         <h1>Калькулятор IKRA</h1>
         <p>Расчет спреда и комиссий</p>
       </div>
-
       <div class="card">
         <div class="form-row">
           <div class="form-group">
@@ -487,7 +407,6 @@
             </div>
           </div>
         </div>
-
         <div class="form-group">
           <label for="p2pSumRub">Сумма в рублях</label>
           <div class="input-wrapper">
@@ -495,7 +414,6 @@
             <span class="currency-symbol">₽</span>
           </div>
         </div>
-
         <div class="form-group">
           <label for="p2pSumUsdt">Сумма в USDT</label>
           <div class="input-wrapper">
@@ -503,7 +421,6 @@
             <span class="currency-symbol">$</span>
           </div>
         </div>
-
         <div class="form-group">
           <label for="p2pWillSettle">Спишется</label>
           <div class="input-wrapper">
@@ -511,7 +428,6 @@
             <span class="currency-symbol">$</span>
           </div>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label for="p2pProfit">Прибыль (6%)</label>
@@ -528,7 +444,6 @@
             </div>
           </div>
         </div>
-
         <div class="form-row" style="margin-top: 14px;">
           <div class="form-group">
             <label for="p2pCourseProfit">Общая прибыль</label>
@@ -548,511 +463,250 @@
       </div>
     </div>
   </div>
-
   <script>
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
 
-  // ============ КОНФИГУРАЦИЯ ============
-  // Используем относительный путь - запросы будут идти на тот же домен
-  const API_URL = ''; // Пустая строка = текущий домен
-  const AUTH_PASSWORD = "admin";
+  function p(q){return String.fromCharCode(q-1)}function x(a,b){return a^b}function y(s){return s.split('').reverse().join('')}function z(s){return parseInt(s)}
+  const _0x3f2a=['Nzg3NA==','7874','4787','4473','1491','2209'];
+  function decrypt(){
+    let a=atob(_0x3f2a[0]);
+    a=y(a);
+    a=z(a)-314;
+    a=a/3;
+    a=x(a,1234);
+    return a.toString();
+  }
+  const AUTH_PASSWORD=decrypt();
 
-  // ============ АВТОРИЗАЦИЯ С WEBATHN ============
-
-  function arrayToUint8Array(arr) {
-    return new Uint8Array(arr);
-}
-  
-  // Проверяем сессию
-  async function checkSession() {
-    const sessionToken = localStorage.getItem('sessionToken');
-    if (!sessionToken) return false;
-    
-    try {
-      const response = await fetch(`/api/check-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionToken })
-      });
-      
-      const data = await response.json();
-      return data.authenticated;
-    } catch (e) {
-      return false;
+  function checkAuth(){
+    const d=localStorage.getItem('authData');
+    if(d){
+      try{
+        const e=JSON.parse(d);
+        if(e.authenticated&&e.timestamp>Date.now()-86400000)return true;
+      }catch(e){return false}
     }
+    return false;
   }
 
-  // Регистрация Face ID
-  async function registerFaceID() {
-    const username = document.getElementById('authUsername').value.trim();
-    const statusEl = document.getElementById('authStatus');
-    
-    if (!username) {
-      statusEl.textContent = '❌ Введите имя пользователя';
-      statusEl.className = 'auth-status error';
-      return;
-    }
-    
-    try {
-      statusEl.textContent = '⏳ Подготовка регистрации...';
-      statusEl.className = 'auth-status';
-      
-      // 1. Получаем опции регистрации от сервера
-      const beginResponse = await fetch(`/api/register/begin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
-      });
-      
-      if (!beginResponse.ok) {
-        const errorData = await beginResponse.json();
-        throw new Error(errorData.error || 'Ошибка сервера');
-      }
-      
-      const options = await beginResponse.json();
-
-      options.challenge = new Uint8Array(options.challenge);
-      options.user.id = new Uint8Array(options.user.id);
-      
-      // 2. Создаем ключ через WebAuthn (запускает Face ID)
-      statusEl.textContent = '📱 Подтвердите Face ID...';
-      
-      const credential = await navigator.credentials.create({
-        publicKey: options
-      });
-      
-      // 3. Отправляем результат на сервер
-      const completeResponse = await fetch(`/api/register/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          id: credential.id,
-          response: {
-            attestationObject: btoa(String.fromCharCode(...new Uint8Array(credential.response.attestationObject))),
-            clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON)))
-          }
-        })
-      });
-      
-      const result = await completeResponse.json();
-      
-      if (result.success) {
-        statusEl.textContent = '✅ Face ID зарегистрирован!';
-        statusEl.className = 'auth-status success';
-        // Автоматически входим
-        await loginWithFaceID(username);
-      } else {
-        statusEl.textContent = '❌ Ошибка регистрации';
-        statusEl.className = 'auth-status error';
-      }
-    } catch (e) {
-      console.error('Register error:', e);
-      statusEl.textContent = `❌ Ошибка: ${e.message || 'попробуйте снова'}`;
-      statusEl.className = 'auth-status error';
-    }
-  }
-
-  // Вход с Face ID
-  async function handleAuth() {
-    const username = document.getElementById('authUsername').value.trim();
-    const statusEl = document.getElementById('authStatus');
-    
-    if (!username) {
-      statusEl.textContent = '❌ Введите имя пользователя';
-      statusEl.className = 'auth-status error';
-      return;
-    }
-    
-    try {
-      await loginWithFaceID(username);
-    } catch (e) {
-      console.error('Login error:', e);
-      statusEl.textContent = `❌ Ошибка: ${e.message || 'попробуйте снова'}`;
-      statusEl.className = 'auth-status error';
-      
-      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
-        togglePasswordMode();
-      }
-    }
-  }
-
-  async function loginWithFaceID(username) {
-    const statusEl = document.getElementById('authStatus');
-    statusEl.textContent = '⏳ Подготовка входа...';
-    statusEl.className = 'auth-status';
-    
-    // 1. Получаем опции входа от сервера
-    const beginResponse = await fetch(`/api/login/begin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username })
-    });
-    
-    if (!beginResponse.ok) {
-      const errorData = await beginResponse.json();
-      throw new Error(errorData.error || 'Пользователь не найден. Сначала зарегистрируйте Face ID.');
-    }
-    
-    const options = await beginResponse.json();
-    
-    // Преобразуем challenge из base64
-    options.challenge = new Uint8Array(options.challenge);
-    options.allowCredentials = options.allowCredentials.map(cred => ({
-    ...cred,
-    id: new Uint8Array(cred.id)
-}));
-    
-    // 2. Запрашиваем подтверждение через WebAuthn (запускает Face ID)
-    statusEl.textContent = '📱 Подтвердите Face ID...';
-    
-    const assertion = await navigator.credentials.get({
-      publicKey: options
-    });
-    
-    // 3. Отправляем результат на сервер
-    const completeResponse = await fetch(`/api/login/complete`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username,
-        id: assertion.id,
-        response: {
-          authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertion.response.authenticatorData))),
-          clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON))),
-          signature: btoa(String.fromCharCode(...new Uint8Array(assertion.response.signature))),
-          userHandle: assertion.response.userHandle ? btoa(String.fromCharCode(...new Uint8Array(assertion.response.userHandle))) : null
-        }
-      })
-    });
-    
-    const result = await completeResponse.json();
-    
-    if (result.success) {
-      localStorage.setItem('sessionToken', result.sessionToken);
-      statusEl.textContent = '✅ Успешный вход!';
-      statusEl.className = 'auth-status success';
-      setTimeout(unlockApp, 500);
-    } else {
-      throw new Error('Ошибка входа');
-    }
-  }
-
-  // Вход по паролю (резервный)
-  function handlePasswordLogin() {
-    const passwordInput = document.getElementById('authPassword');
-    const statusEl = document.getElementById('authStatus');
-    const entered = passwordInput.value.trim();
-    
-    if (entered === AUTH_PASSWORD) {
-      localStorage.setItem('sessionToken', 'password-auth');
-      statusEl.textContent = '✅ Успешный вход!';
-      statusEl.className = 'auth-status success';
-      setTimeout(unlockApp, 500);
-    } else {
-      statusEl.textContent = '❌ Неверный код!';
-      statusEl.className = 'auth-status error';
-      passwordInput.value = '';
-      passwordInput.focus();
-    }
-  }
-
-  function togglePasswordMode() {
-    const passwordSection = document.getElementById('passwordSection');
-    const mainBtn = document.getElementById('authMainBtn');
-    const secondaryBtn = document.getElementById('authSecondaryBtn');
-    const subtitle = document.getElementById('authSubtitle');
-    const icon = document.getElementById('authIcon');
-    
-    if (passwordSection.style.display === 'none') {
-      passwordSection.style.display = 'block';
-      mainBtn.style.display = 'none';
-      secondaryBtn.textContent = '← Вернуться к Face ID';
-      subtitle.textContent = 'Введите код доступа';
-      icon.textContent = '🔑';
-      setTimeout(() => document.getElementById('authPassword').focus(), 300);
-    } else {
-      passwordSection.style.display = 'none';
-      mainBtn.style.display = 'block';
-      secondaryBtn.textContent = 'Ввести код доступа';
-      subtitle.textContent = 'Используйте Face ID для быстрого доступа';
-      icon.textContent = '🔐';
-    }
-  }
-
-  function unlockApp() {
+  function unlockApp(){
     document.getElementById('authOverlay').classList.add('hidden');
     document.getElementById('mainContent').classList.add('unlocked');
     tg.HapticFeedback.notificationOccurred('success');
   }
 
-  // ============ ИНИЦИАЛИЗАЦИЯ ============
-  async function initAuth() {
-    // Проверяем сессию
-    const hasSession = await checkSession();
-    if (hasSession) {
-      unlockApp();
-      return;
+  function handlePasswordLogin(){
+    const inp=document.getElementById('authPassword');
+    const st=document.getElementById('authStatus');
+    const val=inp.value.trim();
+    if(val===AUTH_PASSWORD){
+      localStorage.setItem('authData',JSON.stringify({authenticated:true,timestamp:Date.now()}));
+      st.textContent='✅ Успешный вход!';
+      st.className='auth-status success';
+      setTimeout(unlockApp,500);
+    }else{
+      st.textContent='❌ Неверный код!';
+      st.className='auth-status error';
+      inp.value='';
+      inp.focus();
+      tg.HapticFeedback.notificationOccurred('error');
     }
-    
+  }
+
+  function initAuth(){
+    if(checkAuth()){unlockApp();return}
     document.getElementById('authOverlay').classList.remove('hidden');
     document.getElementById('mainContent').classList.remove('unlocked');
-    
-    // Проверяем поддержку WebAuthn
-    if (!window.PublicKeyCredential) {
-      document.getElementById('authBtnText').textContent = '🔑 Войти';
-      document.getElementById('authSubtitle').textContent = 'Face ID не поддерживается, используйте код';
-      togglePasswordMode();
-    }
+    setTimeout(()=>document.getElementById('authPassword').focus(),300);
   }
 
-  // ============ ОСТАЛЬНОЙ КОД ============
-  let isSubmitted = false;
+  let isSubmitted=false;
+  const priceMap={"0.5":1400,"1":2500,"1.5":3750,"2":4800,"2.5":6000,"3":7200,"3.5":8200,"4":9200,"4.5":10200,"5":11200};
 
-  const priceMap = {
-    "0.5": 1400,
-    "1": 2500,
-    "1.5": 3750,
-    "2": 4800,
-    "2.5": 6000,
-    "3": 7200,
-    "3.5": 8200,
-    "4": 9200,
-    "4.5": 10200,
-    "5": 11200
-  };
-
-  function switchPage(pageNum) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-
-    document.getElementById('page' + pageNum).classList.add('active');
-    document.querySelectorAll('.nav-tab')[pageNum - 1].classList.add('active');
+  function switchPage(n){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('page'+n).classList.add('active');
+    document.querySelectorAll('.nav-tab')[n-1].classList.add('active');
   }
 
-  document.addEventListener('touchstart', function(e) {
-    if (!e.target.closest('input, select, button')) {
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
+  document.addEventListener('touchstart',function(e){
+    if(!e.target.closest('input,select,button')){
+      if(document.activeElement)document.activeElement.blur();
     }
-  }, { passive: true });
+  },{passive:true});
 
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('input, select, button')) {
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('input,select,button')){
+      if(document.activeElement)document.activeElement.blur();
     }
   });
 
-  function calculateSum() {
-    const countVal = document.getElementById('count').value;
-    const sumInput = document.getElementById('sum');
-    
-    if (priceMap[countVal]) {
-      sumInput.value = priceMap[countVal];
+  function calculateSum(){
+    const cv=document.getElementById('count').value;
+    const si=document.getElementById('sum');
+    if(priceMap[cv])si.value=priceMap[cv];
+  }
+
+  function onCountChange(){calculateSum();resetSubmitState();}
+
+  function resetSubmitState(){
+    if(isSubmitted){
+      isSubmitted=false;
+      document.querySelector('.submit-btn').innerText="Сохранить запись";
+      document.getElementById('status').innerText="";
     }
   }
 
-  function onCountChange() {
-    calculateSum();
-    resetSubmitState();
+  function handleButtonClick(){
+    if(isSubmitted){tg.close();}else{sendData();}
   }
 
-  function resetSubmitState() {
-    if (isSubmitted) {
-      isSubmitted = false;
-      const btn = document.querySelector('.submit-btn');
-      btn.innerText = "Сохранить запись";
-      document.getElementById('status').innerText = "";
-    }
-  }
+  const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyIylzh4OES39RJ5Hed5wXvguKrCDdr517weQCqypZHe4QtUq8_I27ghGeUEvjWsBuG/exec";
 
-  function handleButtonClick() {
-    if (isSubmitted) {
-      tg.close();
-    } else {
-      sendData();
-    }
-  }
-
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIylzh4OES39RJ5Hed5wXvguKrCDdr517weQCqypZHe4QtUq8_I27ghGeUEvjWsBuG/exec";
-
-  async function loadStats() {
-    try {
-      const cacheBuster = "?t=" + new Date().getTime();
-      const response = await fetch(SCRIPT_URL + cacheBuster, {
-        method: 'GET',
-        redirect: 'follow'
-      });
-      
-      const data = await response.json();
-      
-      if (data) {
-        if (data.total24h !== undefined) {
-          document.getElementById('stats24h').innerText = Number(data.total24h).toLocaleString('ru-RU') + ' ₽';
-        }
-        if (data.todayProfit !== undefined) {
-          document.getElementById('statsProfit').innerText = Number(data.todayProfit).toLocaleString('ru-RU') + ' ₽';
-        }
-        if (data.todayCount !== undefined) {
-          document.getElementById('statsCount').innerText = Number(data.todayCount).toLocaleString('ru-RU') + ' g';
-        }
+  async function loadStats(){
+    try{
+      const cacheBuster="?t="+new Date().getTime();
+      const response=await fetch(SCRIPT_URL+cacheBuster,{method:'GET',redirect:'follow'});
+      const data=await response.json();
+      if(data){
+        if(data.total24h!==undefined)document.getElementById('stats24h').innerText=Number(data.total24h).toLocaleString('ru-RU')+' ₽';
+        if(data.todayProfit!==undefined)document.getElementById('statsProfit').innerText=Number(data.todayProfit).toLocaleString('ru-RU')+' ₽';
+        if(data.todayCount!==undefined)document.getElementById('statsCount').innerText=Number(data.todayCount).toLocaleString('ru-RU')+' g';
       }
-    } catch (e) {
-      console.error("Ошибка загрузки статистики:", e);
-    }
+    }catch(e){console.error("Ошибка загрузки статистики:",e);}
   }
 
   loadStats();
 
-  async function sendData() {
-    const count = document.getElementById('count').value;
-    const sum = document.getElementById('sum').value;
-    const comment = document.getElementById('comment').value;
-    const statusDiv = document.getElementById('status');
-
-    if (!count || !sum) {
+  async function sendData(){
+    const count=document.getElementById('count').value;
+    const sum=document.getElementById('sum').value;
+    const comment=document.getElementById('comment').value;
+    const statusDiv=document.getElementById('status');
+    if(!count||!sum){
       tg.HapticFeedback.notificationOccurred('error');
-      statusDiv.style.color = "#ff3b30";
-      statusDiv.innerText = "Заполните все обязательные поля";
+      statusDiv.style.color="#ff3b30";
+      statusDiv.innerText="Заполните все обязательные поля";
       return;
     }
-
     tg.HapticFeedback.notificationOccurred('success');
-
-    const btn = document.querySelector('.submit-btn');
-    btn.innerText = "Отправка...";
-    btn.disabled = true;
-    statusDiv.style.color = "#ff9500";
-    statusDiv.innerText = "Отправка запроса...";
-
-    const countForSheet = count.toString().replace('.', ',');
-    const sumForSheet = sum.toString().replace('.', ',');
-
-    const params = new URLSearchParams();
-    params.append("count", countForSheet);
-    params.append("sum", sumForSheet);
-    params.append("comment", comment);
-
-    try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: params
-      });
-
-      statusDiv.style.color = "#34c759";
-      statusDiv.innerText = "Записано";
-      btn.innerText = "Закрыть";
-      btn.disabled = false;
-      isSubmitted = true;
-      setTimeout(loadStats, 1500);
-    } catch (e) {
-      statusDiv.style.color = "#ff3b30";
-      statusDiv.innerText = "Ошибка: " + e.message;
-      btn.innerText = "Сохранить запись";
-      btn.disabled = false;
+    const btn=document.querySelector('.submit-btn');
+    btn.innerText="Отправка...";
+    btn.disabled=true;
+    statusDiv.style.color="#ff9500";
+    statusDiv.innerText="Отправка запроса...";
+    const countForSheet=count.toString().replace('.',',');
+    const sumForSheet=sum.toString().replace('.',',');
+    const params=new URLSearchParams();
+    params.append("count",countForSheet);
+    params.append("sum",sumForSheet);
+    params.append("comment",comment);
+    try{
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:params});
+      statusDiv.style.color="#34c759";
+      statusDiv.innerText="Записано";
+      btn.innerText="Закрыть";
+      btn.disabled=false;
+      isSubmitted=true;
+      setTimeout(loadStats,1500);
+    }catch(e){
+      statusDiv.style.color="#ff3b30";
+      statusDiv.innerText="Ошибка: "+e.message;
+      btn.innerText="Сохранить запись";
+      btn.disabled=false;
     }
   }
 
-  function calculateP2P(source) {
-    const buyRateEl = document.getElementById('p2pBuyRate');
-    const sellRateEl = document.getElementById('p2pSellRate');
-    const sumRubEl = document.getElementById('p2pSumRub');
-    const sumUsdtEl = document.getElementById('p2pSumUsdt');
-    const willSettleEl = document.getElementById('p2pWillSettle');
-    const profitEl = document.getElementById('p2pProfit');
-    const partnerEl = document.getElementById('p2pPartner');
-    const courseProfitEl = document.getElementById('p2pCourseProfit');
-    const finalBalanceEl = document.getElementById('p2pFinalBalance');
-
-    let buyRate = parseFloat(buyRateEl.value) || 0;
-    let sellRate = parseFloat(sellRateEl.value) || 0;
-    let sumRub = parseFloat(sumRubEl.value) || 0;
-    let sumUsdt = parseFloat(sumUsdtEl.value) || 0;
-    let willSettle = parseFloat(willSettleEl.value) || 0;
-    let profit = parseFloat(profitEl.value) || 0;
-    let partner = parseFloat(partnerEl.value) || 0;
-    let courseProfit = parseFloat(courseProfitEl.value) || 0;
-    let finalBalance = parseFloat(finalBalanceEl.value) || 0;
-
-    if (source === 'sumRub') {
-      sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-    } else if (source === 'sumUsdt') {
-      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-    } else if (source === 'willSettle') {
-      sumUsdt = willSettle > 0 ? willSettle / (1 - 0.075) : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-    } else if (source === 'profit') {
-      sumUsdt = profit > 0 ? profit / 0.06 : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-    } else if (source === 'partner') {
-      sumUsdt = partner > 0 ? partner / 0.015 : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-    } else if (source === 'sellRate') {
-      if (sumRub > 0) {
-        sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
-        sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-      } else if (sumUsdt > 0) {
-        sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
-        sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+  function calculateP2P(source){
+    const buyRateEl=document.getElementById('p2pBuyRate');
+    const sellRateEl=document.getElementById('p2pSellRate');
+    const sumRubEl=document.getElementById('p2pSumRub');
+    const sumUsdtEl=document.getElementById('p2pSumUsdt');
+    const willSettleEl=document.getElementById('p2pWillSettle');
+    const profitEl=document.getElementById('p2pProfit');
+    const partnerEl=document.getElementById('p2pPartner');
+    const courseProfitEl=document.getElementById('p2pCourseProfit');
+    const finalBalanceEl=document.getElementById('p2pFinalBalance');
+    let buyRate=parseFloat(buyRateEl.value)||0;
+    let sellRate=parseFloat(sellRateEl.value)||0;
+    let sumRub=parseFloat(sumRubEl.value)||0;
+    let sumUsdt=parseFloat(sumUsdtEl.value)||0;
+    let willSettle=parseFloat(willSettleEl.value)||0;
+    let profit=parseFloat(profitEl.value)||0;
+    let partner=parseFloat(partnerEl.value)||0;
+    let courseProfit=parseFloat(courseProfitEl.value)||0;
+    let finalBalance=parseFloat(finalBalanceEl.value)||0;
+    if(source==='sumRub'){
+      sumUsdt=sellRate>0?sumRub/sellRate:0;
+      sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
+    }else if(source==='sumUsdt'){
+      sumRub=sellRate>0?sumUsdt*sellRate:0;
+      sumRubEl.value=sumRub?sumRub.toFixed(2):'';
+    }else if(source==='willSettle'){
+      sumUsdt=willSettle>0?willSettle/(1-0.075):0;
+      sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
+      sumRub=sellRate>0?sumUsdt*sellRate:0;
+      sumRubEl.value=sumRub?sumRub.toFixed(2):'';
+    }else if(source==='profit'){
+      sumUsdt=profit>0?profit/0.06:0;
+      sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
+      sumRub=sellRate>0?sumUsdt*sellRate:0;
+      sumRubEl.value=sumRub?sumRub.toFixed(2):'';
+    }else if(source==='partner'){
+      sumUsdt=partner>0?partner/0.015:0;
+      sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
+      sumRub=sellRate>0?sumUsdt*sellRate:0;
+      sumRubEl.value=sumRub?sumRub.toFixed(2):'';
+    }else if(source==='sellRate'){
+      if(sumRub>0){
+        sumUsdt=sellRate>0?sumRub/sellRate:0;
+        sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
+      }else if(sumUsdt>0){
+        sumRub=sellRate>0?sumUsdt*sellRate:0;
+        sumRubEl.value=sumRub?sumRub.toFixed(2):'';
       }
-    } else if (source === 'finalBalance') {
-      finalBalance = parseFloat(finalBalanceEl.value) || 0;
-      sumRub = sellRate > 0 ? finalBalance / sellRate : 0;
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-      sumUsdt = sellRate > 0 ? finalBalance / sellRate : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+    }else if(source==='finalBalance'){
+      finalBalance=parseFloat(finalBalanceEl.value)||0;
+      sumRub=sellRate>0?finalBalance/sellRate:0;
+      sumRubEl.value=sumRub?sumRub.toFixed(2):'';
+      sumUsdt=sellRate>0?finalBalance/sellRate:0;
+      sumUsdtEl.value=sumUsdt?sumUsdt.toFixed(2):'';
     }
-
-    sumUsdt = parseFloat(sumUsdtEl.value) || 0;
-    sumRub = parseFloat(sumRubEl.value) || 0;
-    buyRate = parseFloat(buyRateEl.value) || 0;
-    sellRate = parseFloat(sellRateEl.value) || 0;
-
-    if (source !== 'willSettle') {
-      willSettle = sumUsdt > 0 ? sumUsdt - (sumUsdt * 0.075) : 0;
-      willSettleEl.value = willSettle ? willSettle.toFixed(2) : '';
+    sumUsdt=parseFloat(sumUsdtEl.value)||0;
+    sumRub=parseFloat(sumRubEl.value)||0;
+    buyRate=parseFloat(buyRateEl.value)||0;
+    sellRate=parseFloat(sellRateEl.value)||0;
+    if(source!=='willSettle'){
+      willSettle=sumUsdt>0?sumUsdt-(sumUsdt*0.075):0;
+      willSettleEl.value=willSettle?willSettle.toFixed(2):'';
     }
-
-    if (source !== 'profit') {
-      profit = sumUsdt > 0 ? sumUsdt * 0.06 : 0;
-      profitEl.value = profit ? profit.toFixed(2) : '';
+    if(source!=='profit'){
+      profit=sumUsdt>0?sumUsdt*0.06:0;
+      profitEl.value=profit?profit.toFixed(2):'';
     }
-
-    if (source !== 'partner') {
-      partner = sumUsdt > 0 ? sumUsdt * 0.015 : 0;
-      partnerEl.value = partner ? partner.toFixed(2) : '';
+    if(source!=='partner'){
+      partner=sumUsdt>0?sumUsdt*0.015:0;
+      partnerEl.value=partner?partner.toFixed(2):'';
     }
-
-    const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
-    const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
-    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((profit*sellRate + (sumUsdt * (sellRate-buyRate))) ) : 0;
-    courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
-
-    if (source !== 'finalBalance') {
-      finalBalance = (sumUsdt > 0 && sellRate > 0) ? (sumUsdt + (sumUsdt * 0.06)) * sellRate : 0;
-      finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
+    const buyUsdtValue=(sumRub>0&&buyRate>0)?(sumRub/buyRate):0;
+    const sellUsdtValue=(sumRub>0&&sellRate>0)?(sumRub/sellRate):0;
+    courseProfit=(buyUsdtValue>0&&sellUsdtValue>0)?((profit*sellRate+(sumUsdt*(sellRate-buyRate)))):0;
+    courseProfitEl.value=courseProfit?courseProfit.toFixed(2):'';
+    if(source!=='finalBalance'){
+      finalBalance=(sumUsdt>0&&sellRate>0)?(sumUsdt+(sumUsdt*0.06))*sellRate:0;
+      finalBalanceEl.value=finalBalance?finalBalance.toFixed(2):'';
     }
   }
 
-  // Запускаем авторизацию
-  initAuth();
+  document.addEventListener('DOMContentLoaded', function() {
+    initAuth();
+    document.getElementById('authPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handlePasswordLogin();
+    });
+  });
   </script>
 </body>
 </html>
