@@ -34,6 +34,127 @@
       min-height: 100vh;
     }
 
+    /* Стили для экрана авторизации */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    .auth-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .auth-icon {
+      font-size: 64px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .auth-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--hint-color);
+      margin: 0 0 24px 0;
+    }
+
+    .auth-btn {
+      width: 100%;
+      height: 52px;
+      background-color: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+      transition: transform 0.1s ease, opacity 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    .auth-btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .auth-btn.secondary {
+      background-color: transparent;
+      color: var(--hint-color);
+      box-shadow: none;
+      font-size: 14px;
+      height: 40px;
+    }
+
+    .auth-password-input {
+      width: 100%;
+      height: 48px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-color);
+      outline: none;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    .auth-password-input:focus {
+      border-color: var(--button-color);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    }
+
+    .auth-status {
+      font-size: 13px;
+      color: var(--hint-color);
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .auth-status.error {
+      color: #ff3b30;
+    }
+
+    .auth-status.success {
+      color: #34c759;
+    }
+
+    /* Остальные стили остаются без изменений */
     .nav-tabs {
       display: flex;
       background: var(--card-bg);
@@ -228,154 +349,194 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+
+    /* Блокировка основного контента до авторизации */
+    .main-content {
+      opacity: 0.3;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .main-content.unlocked {
+      opacity: 1;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
 
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchPage(1)">Deals</div>
-    <div class="nav-tab" onclick="switchPage(2)">Processing</div>
+  <!-- ЭКРАН АВТОРИЗАЦИИ -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+      <span class="auth-icon" id="authIcon">🔐</span>
+      <h2 class="auth-title" id="authTitle">Вход в систему</h2>
+      <p class="auth-subtitle" id="authSubtitle">Используйте Face ID для быстрого доступа</p>
+      
+      <button class="auth-btn" id="authMainBtn" onclick="handleAuth()">
+        <span id="authBtnText">🔓 Войти с Face ID</span>
+      </button>
+      
+      <div id="passwordSection" style="display: none;">
+        <input type="password" class="auth-password-input" id="authPassword" placeholder="Введите код" maxlength="6" inputmode="numeric">
+        <button class="auth-btn" onclick="handlePasswordLogin()">Войти по коду</button>
+      </div>
+      
+      <button class="auth-btn secondary" id="authSecondaryBtn" onclick="togglePasswordMode()">
+        Ввести код доступа
+      </button>
+      
+      <div class="auth-status" id="authStatus"></div>
+    </div>
   </div>
 
-  <div id="page1" class="page active">
-    <div class="header">
-      <div class="header-icon">
-        <a href="https://docs.google.com/spreadsheets/d/1KmMul8xo0rvzvxRPfrCjhxJiajeN0wx9haD2q116QBw/edit?gid=0#gid=0" target="_blank" rel="noopener" style="text-decoration: none;">📦</a>
-      </div>
-      <h1>Учёт товара</h1>
-      <p>Быстрая запись продаж</p>
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div class="main-content" id="mainContent">
+
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="switchPage(1)">Deals</div>
+      <div class="nav-tab" onclick="switchPage(2)">Processing</div>
     </div>
 
-    <div class="card">
-      <div class="form-group">
-        <label for="count">Количество товара</label>
-        <div class="input-wrapper select-wrapper">
-          <select id="count" onchange="onCountChange()">
-            <option value="" disabled selected>Выберите объем...</option>
-            <option value="0.5">0.5 g</option>
-            <option value="1">1 g</option>
-            <option value="1.5">1.5 g</option>
-            <option value="2">2 g</option>
-            <option value="2.5">2.5 g</option>
-            <option value="3">3 g</option>
-            <option value="3.5">3.5 g</option>
-            <option value="4">4 g</option>
-            <option value="4.5">4.5 g</option>
-            <option value="5">5 g</option>
-          </select>
+    <div id="page1" class="page active">
+      <div class="header">
+        <div class="header-icon">
+          <a href="https://docs.google.com/spreadsheets/d/1KmMul8xo0rvzvxRPfrCjhxJiajeN0wx9haD2q116QBw/edit?gid=0#gid=0" target="_blank" rel="noopener" style="text-decoration: none;">📦</a>
         </div>
+        <h1>Учёт товара</h1>
+        <p>Быстрая запись продаж</p>
       </div>
 
-      <div class="form-group">
-        <label for="sum">Сумма к оплате</label>
-        <div class="input-wrapper">
-          <input type="number" id="sum" placeholder="0" inputmode="numeric" oninput="resetSubmitState()">
-          <span class="currency-symbol">₽</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="comment">Комментарий</label>
-        <div class="input-wrapper">
-          <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <span class="stats-title">Записано за 24ч</span>
-        <span class="stats-value" id="stats24h">0 ₽</span>
-      </div>
-      <div class="stats-row">
-        <span class="stats-title">Прибыль за сегодня</span>
-        <span class="stats-value" id="statsProfit">0 ₽</span>
-      </div>
-      <div class="stats-row">
-        <span class="stats-title">Количество за сегодня</span>
-        <span class="stats-value" id="statsCount">0 g</span>
-      </div>
-    </div>
-
-    <div id="status" style="margin-bottom: 15px; font-size: 14px; text-align: center; color: #ff9500; font-weight: 600;"></div>
-    <button class="submit-btn" onclick="handleButtonClick()">Сохранить запись</button>
-  </div>
-
-  <div id="page2" class="page">
-    <div class="header">
-      <div class="header-icon">💱</div>
-      <h1>Калькулятор IKRA</h1>
-      <p>Расчет спреда и комиссий</p>
-    </div>
-
-    <div class="card">
-      <div class="form-row">
+      <div class="card">
         <div class="form-group">
-          <label for="p2pBuyRate">Курс покуп.</label>
-          <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P('buyRate')">
+          <label for="count">Количество товара</label>
+          <div class="input-wrapper select-wrapper">
+            <select id="count" onchange="onCountChange()">
+              <option value="" disabled selected>Выберите объем...</option>
+              <option value="0.5">0.5 g</option>
+              <option value="1">1 g</option>
+              <option value="1.5">1.5 g</option>
+              <option value="2">2 g</option>
+              <option value="2.5">2.5 g</option>
+              <option value="3">3 g</option>
+              <option value="3.5">3.5 g</option>
+              <option value="4">4 g</option>
+              <option value="4.5">4.5 g</option>
+              <option value="5">5 g</option>
+            </select>
           </div>
         </div>
+
         <div class="form-group">
-          <label for="p2pSellRate">Курс продаж.</label>
+          <label for="sum">Сумма к оплате</label>
           <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P('sellRate')">
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="p2pSumRub">Сумма в рублях</label>
-        <div class="input-wrapper">
-          <input type="number" id="p2pSumRub" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumRub')">
-          <span class="currency-symbol">₽</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="p2pSumUsdt">Сумма в USDT</label>
-        <div class="input-wrapper">
-          <input type="number" step="0.01" id="p2pSumUsdt" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumUsdt')">
-          <span class="currency-symbol">$</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="p2pWillSettle">Спишется</label>
-        <div class="input-wrapper">
-          <input type="number" step="0.01" id="p2pWillSettle" placeholder="0" oninput="calculateP2P('willSettle')">
-          <span class="currency-symbol">$</span>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="p2pProfit">Прибыль (6%)</label>
-          <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pProfit" placeholder="0" oninput="calculateP2P('profit')">
-            <span class="currency-symbol">$</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="p2pPartner">Партнерам (1.5%)</label>
-          <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pPartner" placeholder="0" oninput="calculateP2P('partner')">
-            <span class="currency-symbol">$</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row" style="margin-top: 14px;">
-        <div class="form-group">
-          <label for="p2pCourseProfit">Общая прибыль</label>
-          <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" oninput="calculateP2P('courseProfit')">
+            <input type="number" id="sum" placeholder="0" inputmode="numeric" oninput="resetSubmitState()">
             <span class="currency-symbol">₽</span>
           </div>
         </div>
+
         <div class="form-group">
-          <label for="p2pFinalBalance">К выводу</label>
+          <label for="comment">Комментарий</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pFinalBalance" placeholder="0" oninput="calculateP2P('finalBalance')">
+            <input type="text" id="comment" placeholder="Имя или примечание" oninput="resetSubmitState()">
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <span class="stats-title">Записано за 24ч</span>
+          <span class="stats-value" id="stats24h">0 ₽</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-title">Прибыль за сегодня</span>
+          <span class="stats-value" id="statsProfit">0 ₽</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-title">Количество за сегодня</span>
+          <span class="stats-value" id="statsCount">0 g</span>
+        </div>
+      </div>
+
+      <div id="status" style="margin-bottom: 15px; font-size: 14px; text-align: center; color: #ff9500; font-weight: 600;"></div>
+      <button class="submit-btn" onclick="handleButtonClick()">Сохранить запись</button>
+    </div>
+
+    <div id="page2" class="page">
+      <div class="header">
+        <div class="header-icon">💱</div>
+        <h1>Калькулятор IKRA</h1>
+        <p>Расчет спреда и комиссий</p>
+      </div>
+
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p2pBuyRate">Курс покуп.</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P('buyRate')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="p2pSellRate">Курс продаж.</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P('sellRate')">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p2pSumRub">Сумма в рублях</label>
+          <div class="input-wrapper">
+            <input type="number" id="p2pSumRub" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumRub')">
             <span class="currency-symbol">₽</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p2pSumUsdt">Сумма в USDT</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.01" id="p2pSumUsdt" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumUsdt')">
+            <span class="currency-symbol">$</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p2pWillSettle">Спишется</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.01" id="p2pWillSettle" placeholder="0" oninput="calculateP2P('willSettle')">
+            <span class="currency-symbol">$</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p2pProfit">Прибыль (6%)</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.01" id="p2pProfit" placeholder="0" oninput="calculateP2P('profit')">
+              <span class="currency-symbol">$</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="p2pPartner">Партнерам (1.5%)</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.01" id="p2pPartner" placeholder="0" oninput="calculateP2P('partner')">
+              <span class="currency-symbol">$</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 14px;">
+          <div class="form-group">
+            <label for="p2pCourseProfit">Общая прибыль</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" oninput="calculateP2P('courseProfit')">
+              <span class="currency-symbol">₽</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="p2pFinalBalance">К выводу</label>
+            <div class="input-wrapper">
+              <input type="number" step="0.01" id="p2pFinalBalance" placeholder="0" oninput="calculateP2P('finalBalance')">
+              <span class="currency-symbol">₽</span>
+            </div>
           </div>
         </div>
       </div>
@@ -387,6 +548,154 @@
   tg.ready();
   tg.expand();
 
+  // ============ АВТОРИЗАЦИЯ ============
+  const AUTH_PASSWORD = "1234"; // Замените на свой код
+  let isPasswordMode = false;
+  let isAuthenticated = false;
+
+  // Проверяем, был ли уже выполнен вход
+  function checkAuth() {
+    const authData = localStorage.getItem('authData');
+    if (authData) {
+      try {
+        const data = JSON.parse(authData);
+        if (data.authenticated && data.timestamp > Date.now() - 86400000) { // 24 часа
+          return true;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // Инициализация авторизации
+  function initAuth() {
+    if (checkAuth()) {
+      unlockApp();
+      return;
+    }
+    
+    // Показываем экран входа
+    document.getElementById('authOverlay').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('unlocked');
+    
+    // Проверяем поддержку WebAuthn
+    if (window.PublicKeyCredential) {
+      document.getElementById('authBtnText').textContent = '🔓 Войти с Face ID';
+    } else {
+      document.getElementById('authBtnText').textContent = '🔑 Войти';
+      document.getElementById('authSubtitle').textContent = 'Face ID не поддерживается, используйте код';
+      togglePasswordMode();
+    }
+  }
+
+  // Основная кнопка входа
+  async function handleAuth() {
+    const statusEl = document.getElementById('authStatus');
+    statusEl.textContent = '⏳ Проверка...';
+    statusEl.className = 'auth-status';
+    
+    try {
+      if (window.PublicKeyCredential) {
+        // Пытаемся использовать WebAuthn (Face ID)
+        const credential = await navigator.credentials.get({
+          publicKey: {
+            challenge: new Uint8Array(32),
+            rpId: window.location.hostname,
+            allowCredentials: [],
+            userVerification: 'required',
+            timeout: 60000
+          }
+        });
+        
+        if (credential) {
+          // Сохраняем успешный вход
+          localStorage.setItem('authData', JSON.stringify({
+            authenticated: true,
+            timestamp: Date.now()
+          }));
+          statusEl.textContent = '✅ Успешный вход!';
+          statusEl.className = 'auth-status success';
+          setTimeout(unlockApp, 500);
+          return;
+        }
+      }
+      
+      // Если Face ID не сработал или не поддерживается
+      statusEl.textContent = '❌ Ошибка входа. Используйте код.';
+      statusEl.className = 'auth-status error';
+      togglePasswordMode();
+      
+    } catch (e) {
+      console.error('Auth error:', e);
+      statusEl.textContent = '❌ Ошибка: ' + (e.message || 'попробуйте снова');
+      statusEl.className = 'auth-status error';
+      
+      // Если пользователь отменил Face ID, показываем ввод кода
+      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+        togglePasswordMode();
+      }
+    }
+  }
+
+  // Вход по паролю
+  function handlePasswordLogin() {
+    const passwordInput = document.getElementById('authPassword');
+    const statusEl = document.getElementById('authStatus');
+    const entered = passwordInput.value.trim();
+    
+    if (entered === AUTH_PASSWORD) {
+      localStorage.setItem('authData', JSON.stringify({
+        authenticated: true,
+        timestamp: Date.now()
+      }));
+      statusEl.textContent = '✅ Успешный вход!';
+      statusEl.className = 'auth-status success';
+      setTimeout(unlockApp, 500);
+    } else {
+      statusEl.textContent = '❌ Неверный код!';
+      statusEl.className = 'auth-status error';
+      passwordInput.value = '';
+      passwordInput.focus();
+    }
+  }
+
+  // Переключение на ввод пароля
+  function togglePasswordMode() {
+    isPasswordMode = !isPasswordMode;
+    const passwordSection = document.getElementById('passwordSection');
+    const mainBtn = document.getElementById('authMainBtn');
+    const secondaryBtn = document.getElementById('authSecondaryBtn');
+    const subtitle = document.getElementById('authSubtitle');
+    const icon = document.getElementById('authIcon');
+    
+    if (isPasswordMode) {
+      passwordSection.style.display = 'block';
+      mainBtn.style.display = 'none';
+      secondaryBtn.textContent = '← Вернуться к Face ID';
+      subtitle.textContent = 'Введите код доступа';
+      icon.textContent = '🔑';
+      document.getElementById('authPassword').focus();
+    } else {
+      passwordSection.style.display = 'none';
+      mainBtn.style.display = 'block';
+      secondaryBtn.textContent = 'Ввести код доступа';
+      subtitle.textContent = 'Используйте Face ID для быстрого доступа';
+      icon.textContent = '🔐';
+    }
+  }
+
+  // Разблокировка приложения
+  function unlockApp() {
+    isAuthenticated = true;
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('mainContent').classList.add('unlocked');
+    tg.HapticFeedback.notificationOccurred('success');
+  }
+
+  // ============ ОСТАЛЬНОЙ КОД ============
+  
   let isSubmitted = false;
 
   const priceMap = {
@@ -614,20 +923,4 @@
     }
 
     if (source !== 'partner') {
-      partner = sumUsdt > 0 ? sumUsdt * 0.015 : 0;
-      partnerEl.value = partner ? partner.toFixed(2) : '';
-    }
-
-    const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
-    const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
-    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((profit*sellRate + (sumUsdt * (sellRate-buyRate))) ) : 0;
-    courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
-
-    if (source !== 'finalBalance') {
-      finalBalance = (sumUsdt > 0 && sellRate > 0) ? (sumUsdt + (sumUsdt * 0.06)) * sellRate : 0;
-      finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
-    }
-  }
-</script>
-</body>
-</html>
+      partner = sumUsdt > 0 ? sumUsdt
