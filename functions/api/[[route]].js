@@ -57,6 +57,8 @@ export async function onRequest(context) {
     if (path === '/api/register/complete' && request.method === 'POST') {
         const data = await request.json();
         const { username, id, response } = data;
+        const attestationObject = Uint8Array.from(atob(response.attestationObject), c => c.charCodeAt(0));
+        const clientDataJSON = Uint8Array.from(atob(response.clientDataJSON), c => c.charCodeAt(0));
         
         // Сохраняем публичный ключ пользователя
         await env.SESSION_STORE.put(`user:${username}`, JSON.stringify({
@@ -111,6 +113,9 @@ export async function onRequest(context) {
     if (path === '/api/login/complete' && request.method === 'POST') {
         const data = await request.json();
         const { username, id, response } = data;
+        const authenticatorData = Uint8Array.from(atob(response.authenticatorData), c => c.charCodeAt(0));
+        const clientDataJSON = Uint8Array.from(atob(response.clientDataJSON), c => c.charCodeAt(0));
+        const signature = Uint8Array.from(atob(response.signature), c => c.charCodeAt(0));
         
         // Проверяем challenge
         const storedChallenge = await env.SESSION_STORE.get(`challenge:${username}`);
