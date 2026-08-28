@@ -302,22 +302,28 @@
   <div id="page2" class="page">
     <div class="header">
       <div class="header-icon">💱</div>
-      <h1>Калькулятор IKRA</h1>
-      <p>Расчет спреда и комиссий</p>
+      <h1>Калькулятор P2P</h1>
+      <p>Расчет спреда и курсов</p>
     </div>
 
     <div class="card">
       <div class="form-row">
         <div class="form-group">
-          <label for="p2pBuyRate">Курс покупки</label>
+          <label for="p2pBuyRate">Курс покуп.</label>
           <div class="input-wrapper">
             <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P('buyRate')">
           </div>
         </div>
         <div class="form-group">
-          <label for="p2pSellRate">Курс продажи</label>
+          <label for="p2pSellRate">Курс продаж.</label>
           <div class="input-wrapper">
             <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P('sellRate')">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="p2pBalance">Баланс USDT</label>
+          <div class="input-wrapper">
+            <input type="number" step="0.01" id="p2pBalance" placeholder="0" inputmode="numeric" oninput="calculateP2P('balance')">
           </div>
         </div>
       </div>
@@ -355,7 +361,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="p2pPartner">Комиссия (1.5%)</label>
+          <label for="p2pPartner">Партнерам (1.5%)</label>
           <div class="input-wrapper">
             <input type="number" step="0.01" id="p2pPartner" placeholder="0" oninput="calculateP2P('partner')">
             <span class="currency-symbol">$</span>
@@ -365,7 +371,7 @@
 
       <div class="form-row" style="margin-top: 14px;">
         <div class="form-group">
-          <label for="p2pCourseProfit">Прибыль (+курс)</label>
+          <label for="p2pCourseProfit">Прибыль (курс)</label>
           <div class="input-wrapper">
             <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" oninput="calculateP2P('courseProfit')">
             <span class="currency-symbol">$</span>
@@ -543,6 +549,7 @@
   function calculateP2P(source) {
     const buyRateEl = document.getElementById('p2pBuyRate');
     const sellRateEl = document.getElementById('p2pSellRate');
+    const balanceEl = document.getElementById('p2pBalance');
     const sumRubEl = document.getElementById('p2pSumRub');
     const sumUsdtEl = document.getElementById('p2pSumUsdt');
     const willSettleEl = document.getElementById('p2pWillSettle');
@@ -553,6 +560,7 @@
 
     let buyRate = parseFloat(buyRateEl.value) || 0;
     let sellRate = parseFloat(sellRateEl.value) || 0;
+    let balance = parseFloat(balanceEl.value) || 0;
     let sumRub = parseFloat(sumRubEl.value) || 0;
     let sumUsdt = parseFloat(sumUsdtEl.value) || 0;
     let willSettle = parseFloat(willSettleEl.value) || 0;
@@ -582,7 +590,7 @@
       sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
       sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
       sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-    } else if (source === 'sellRate' || source === 'buyRate') {
+    } else if (source === 'sellRate') {
       if (sumRub > 0) {
         sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
         sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
@@ -591,17 +599,15 @@
         sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
       }
     } else if (source === 'finalBalance') {
-      // Если вводят "К выводу", пересчитываем общие суммы через обратную пропорцию
-      sumRub = finalBalance;
-      sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
-      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
-      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+      balance = finalBalance - partner;
+      balanceEl.value = balance ? balance.toFixed(2) : '';
     }
 
     sumUsdt = parseFloat(sumUsdtEl.value) || 0;
     sumRub = parseFloat(sumRubEl.value) || 0;
     buyRate = parseFloat(buyRateEl.value) || 0;
     sellRate = parseFloat(sellRateEl.value) || 0;
+    balance = parseFloat(balanceEl.value) || 0;
 
     if (source !== 'willSettle') {
       willSettle = sumUsdt > 0 ? sumUsdt - (sumUsdt * 0.075) : 0;
@@ -623,9 +629,9 @@
     courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((sumUsdt + (sumUsdt * 0.06)) * sellRate) : 0;
     courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
-    finalBalance = sumRub;
+    finalBalance = balance + partner;
     finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
   }
-  </script>
+</script>
 </body>
 </html>
