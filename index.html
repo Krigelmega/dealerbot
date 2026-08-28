@@ -34,7 +34,6 @@
       min-height: 100vh;
     }
 
-    /* Стили для экрана авторизации */
     .auth-overlay {
       position: fixed;
       top: 0;
@@ -154,7 +153,6 @@
       color: #34c759;
     }
 
-    /* Остальные стили */
     .nav-tabs {
       display: flex;
       background: var(--card-bg);
@@ -371,8 +369,18 @@
       <h2 class="auth-title" id="authTitle">Вход в систему</h2>
       <p class="auth-subtitle" id="authSubtitle">Используйте Face ID для быстрого доступа</p>
       
+      <!-- Поле для имени пользователя -->
+      <div class="form-group">
+        <input type="text" id="authUsername" placeholder="Введите имя пользователя" style="width: 100%; height: 48px; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 0 16px; font-size: 16px; font-weight: 500; color: var(--text-color); outline: none;">
+      </div>
+      
       <button class="auth-btn" id="authMainBtn" onclick="handleAuth()">
         <span id="authBtnText">🔓 Войти с Face ID</span>
+      </button>
+      
+      <!-- Кнопка регистрации (первый раз) -->
+      <button class="auth-btn secondary" onclick="registerFaceID()" style="margin-bottom: 12px;">
+        📝 Зарегистрировать Face ID
       </button>
       
       <div id="passwordSection" style="display: none;">
@@ -390,7 +398,6 @@
 
   <!-- ОСНОВНОЙ КОНТЕНТ -->
   <div class="main-content" id="mainContent">
-
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="switchPage(1)">Deals</div>
       <div class="nav-tab" onclick="switchPage(2)">Processing</div>
@@ -547,83 +554,197 @@
   tg.ready();
   tg.expand();
 
-  // ============ АВТОРИЗАЦИЯ (упрощённая) ============
+  // ============ КОНФИГУРАЦИЯ ============
+  // Используем относительный путь - запросы будут идти на тот же домен
+  const API_URL = ''; // Пустая строка = текущий домен
   const AUTH_PASSWORD = "1234";
-  let isPasswordMode = false;
 
-  // Проверяем, был ли уже выполнен вход
-  function checkAuth() {
-    const authData = localStorage.getItem('authData');
-    if (authData) {
-      try {
-        const data = JSON.parse(authData);
-        if (data.authenticated && data.timestamp > Date.now() - 86400000) {
-          return true;
-        }
-      } catch (e) {
-        return false;
-      }
+  // ============ АВТОРИЗАЦИЯ С WEBATHN ============
+  
+  // Проверяем сессию
+  async function checkSession() {
+    const sessionToken = localStorage.getItem('sessionToken');
+    if (!sessionToken) return false;
+    
+    try {
+      const response = await fetch(`/api/check-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken })
+      });
+      
+      const data = await response.json();
+      return data.authenticated;
+    } catch (e) {
+      return false;
     }
-    return false;
   }
 
-  function initAuth() {
-    if (checkAuth()) {
-      unlockApp();
+  // Регистрация Face ID
+  async function registerFaceID() {
+    const username = document.getElementById('authUsername').value.trim();
+    const statusEl = document.getElementById('authStatus');
+    
+    if (!username) {
+      statusEl.textContent = '❌ Введите имя пользователя';
+      statusEl.className = 'auth-status error';
       return;
     }
     
-    document.getElementById('authOverlay').classList.remove('hidden');
-    document.getElementById('mainContent').classList.remove('unlocked');
-    
-    // Проверяем поддержку Face ID
-    if (window.PublicKeyCredential) {
-      document.getElementById('authBtnText').textContent = '🔓 Войти с Face ID';
-    } else {
-      document.getElementById('authBtnText').textContent = '🔑 Войти';
-      document.getElementById('authSubtitle').textContent = 'Face ID не поддерживается, используйте код';
-      togglePasswordMode();
+    try {
+      statusEl.textContent = '⏳ Подготовка регистрации...';
+      statusEl.className = 'auth-status';
+      
+      // 1. Получаем опции регистрации от сервера
+      const beginResponse = await fetch(`/api/register/begin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+      
+      if (!beginResponse.ok) {
+        const errorData = await beginResponse.json();
+        throw new Error(errorData.error || 'Ошибка сервера');
+      }
+      
+      const options = await beginResponse.json();
+      
+      // Преобразуем challenge и user.id из base64 в ArrayBuffer
+      options.challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
+      options.user.id = Uint8Array.from(atob(options.user.id), c => c.charCodeAt(0));
+      
+      // 2. Создаем ключ через WebAuthn (запускает Face ID)
+      statusEl.textContent = '📱 Подтвердите Face ID...';
+      
+      const credential = await navigator.credentials.create({
+        publicKey: options
+      });
+      
+      // 3. Отправляем результат на сервер
+      const completeResponse = await fetch(`/api/register/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          id: credential.id,
+          response: {
+            attestationObject: btoa(String.fromCharCode(...new Uint8Array(credential.response.attestationObject))),
+            clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON)))
+          }
+        })
+      });
+      
+      const result = await completeResponse.json();
+      
+      if (result.success) {
+        statusEl.textContent = '✅ Face ID зарегистрирован!';
+        statusEl.className = 'auth-status success';
+        // Автоматически входим
+        await loginWithFaceID(username);
+      } else {
+        statusEl.textContent = '❌ Ошибка регистрации';
+        statusEl.className = 'auth-status error';
+      }
+    } catch (e) {
+      console.error('Register error:', e);
+      statusEl.textContent = `❌ Ошибка: ${e.message || 'попробуйте снова'}`;
+      statusEl.className = 'auth-status error';
     }
   }
 
-  // ИМИТАЦИЯ Face ID
+  // Вход с Face ID
   async function handleAuth() {
+    const username = document.getElementById('authUsername').value.trim();
     const statusEl = document.getElementById('authStatus');
-    statusEl.textContent = '⏳ Сканирование лица...';
+    
+    if (!username) {
+      statusEl.textContent = '❌ Введите имя пользователя';
+      statusEl.className = 'auth-status error';
+      return;
+    }
+    
+    try {
+      await loginWithFaceID(username);
+    } catch (e) {
+      console.error('Login error:', e);
+      statusEl.textContent = `❌ Ошибка: ${e.message || 'попробуйте снова'}`;
+      statusEl.className = 'auth-status error';
+      
+      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+        togglePasswordMode();
+      }
+    }
+  }
+
+  async function loginWithFaceID(username) {
+    const statusEl = document.getElementById('authStatus');
+    statusEl.textContent = '⏳ Подготовка входа...';
     statusEl.className = 'auth-status';
     
-    // Имитируем процесс Face ID (анимация 2 секунды)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 1. Получаем опции входа от сервера
+    const beginResponse = await fetch(`/api/login/begin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
     
-    // Имитация успешного сканирования (всегда успешно)
-    // В реальном приложении здесь был бы вызов WebAuthn API
-    const success = true;
+    if (!beginResponse.ok) {
+      const errorData = await beginResponse.json();
+      throw new Error(errorData.error || 'Пользователь не найден. Сначала зарегистрируйте Face ID.');
+    }
     
-    if (success) {
-      localStorage.setItem('authData', JSON.stringify({
-        authenticated: true,
-        timestamp: Date.now()
-      }));
-      statusEl.textContent = '✅ Face ID успешен!';
+    const options = await beginResponse.json();
+    
+    // Преобразуем challenge из base64
+    options.challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
+    options.allowCredentials = options.allowCredentials.map(cred => ({
+      ...cred,
+      id: Uint8Array.from(atob(cred.id), c => c.charCodeAt(0))
+    }));
+    
+    // 2. Запрашиваем подтверждение через WebAuthn (запускает Face ID)
+    statusEl.textContent = '📱 Подтвердите Face ID...';
+    
+    const assertion = await navigator.credentials.get({
+      publicKey: options
+    });
+    
+    // 3. Отправляем результат на сервер
+    const completeResponse = await fetch(`/api/login/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        id: assertion.id,
+        response: {
+          authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertion.response.authenticatorData))),
+          clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON))),
+          signature: btoa(String.fromCharCode(...new Uint8Array(assertion.response.signature))),
+          userHandle: assertion.response.userHandle ? btoa(String.fromCharCode(...new Uint8Array(assertion.response.userHandle))) : null
+        }
+      })
+    });
+    
+    const result = await completeResponse.json();
+    
+    if (result.success) {
+      localStorage.setItem('sessionToken', result.sessionToken);
+      statusEl.textContent = '✅ Успешный вход!';
       statusEl.className = 'auth-status success';
       setTimeout(unlockApp, 500);
     } else {
-      statusEl.textContent = '❌ Ошибка Face ID. Используйте код.';
-      statusEl.className = 'auth-status error';
-      togglePasswordMode();
+      throw new Error('Ошибка входа');
     }
   }
 
+  // Вход по паролю (резервный)
   function handlePasswordLogin() {
     const passwordInput = document.getElementById('authPassword');
     const statusEl = document.getElementById('authStatus');
     const entered = passwordInput.value.trim();
     
     if (entered === AUTH_PASSWORD) {
-      localStorage.setItem('authData', JSON.stringify({
-        authenticated: true,
-        timestamp: Date.now()
-      }));
+      localStorage.setItem('sessionToken', 'password-auth');
       statusEl.textContent = '✅ Успешный вход!';
       statusEl.className = 'auth-status success';
       setTimeout(unlockApp, 500);
@@ -636,14 +757,13 @@
   }
 
   function togglePasswordMode() {
-    isPasswordMode = !isPasswordMode;
     const passwordSection = document.getElementById('passwordSection');
     const mainBtn = document.getElementById('authMainBtn');
     const secondaryBtn = document.getElementById('authSecondaryBtn');
     const subtitle = document.getElementById('authSubtitle');
     const icon = document.getElementById('authIcon');
     
-    if (isPasswordMode) {
+    if (passwordSection.style.display === 'none') {
       passwordSection.style.display = 'block';
       mainBtn.style.display = 'none';
       secondaryBtn.textContent = '← Вернуться к Face ID';
@@ -665,11 +785,27 @@
     tg.HapticFeedback.notificationOccurred('success');
   }
 
-  // Запускаем авторизацию при загрузке
-  initAuth();
+  // ============ ИНИЦИАЛИЗАЦИЯ ============
+  async function initAuth() {
+    // Проверяем сессию
+    const hasSession = await checkSession();
+    if (hasSession) {
+      unlockApp();
+      return;
+    }
+    
+    document.getElementById('authOverlay').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('unlocked');
+    
+    // Проверяем поддержку WebAuthn
+    if (!window.PublicKeyCredential) {
+      document.getElementById('authBtnText').textContent = '🔑 Войти';
+      document.getElementById('authSubtitle').textContent = 'Face ID не поддерживается, используйте код';
+      togglePasswordMode();
+    }
+  }
 
   // ============ ОСТАЛЬНОЙ КОД ============
-  
   let isSubmitted = false;
 
   const priceMap = {
@@ -912,10 +1048,8 @@
     }
   }
 
-  // Запускаем принудительно, если вдруг initAuth не сработал
-  setTimeout(() => {
-    if (!document.getElementById('mainContent').classList.contains('unlocked')) {
-      initAuth();
-    }
-  }, 100);
-</script>
+  // Запускаем авторизацию
+  initAuth();
+  </script>
+</body>
+</html>
