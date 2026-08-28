@@ -600,9 +600,9 @@
       }
     } else if (source === 'finalBalance') {
       finalBalance = parseFloat(finalBalanceEl.value) || 0;
-      sumRub = finalBalance;
+      sumRub = sellRate > 0 ? finalBalance / sellRate : 0;
       sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
-      sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
+      sumUsdt = sellRate > 0 ? finalBalance / sellRate : 0;
       sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
     }
 
@@ -632,7 +632,7 @@
     courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
     if (source !== 'finalBalance') {
-      finalBalance = sumRub;
+      finalBalance = (sumUsdt > 0 && sellRate > 0) ? (sumUsdt + (sumUsdt * 0.06)) * sellRate : 0;
       finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
     }
   }
