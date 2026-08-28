@@ -309,17 +309,18 @@
     <div class="card">
       <div class="form-row">
         <div class="form-group">
-          <label for="p2pBuyRate">Курс покуп.</label>
+          <label for="p2pBuyRate">Курс покупки</label>
           <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P('buyRate')">
+            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P()">
           </div>
         </div>
         <div class="form-group">
-          <label for="p2pSellRate">Курс продаж.</label>
+          <label for="p2pSellRate">Курс продажи</label>
           <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P('sellRate')">
+            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P()">
           </div>
         </div>
+      </div>
 
       <div class="form-group">
         <label for="p2pSumRub">Сумма в рублях</label>
