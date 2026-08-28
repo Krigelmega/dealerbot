@@ -371,10 +371,10 @@
 
       <div class="form-row" style="margin-top: 14px;">
         <div class="form-group">
-          <label for="p2pCourseProfit">Прибыль + курс</label>
+          <label for="p2pCourseProfit">Общая прибыль</label>
           <div class="input-wrapper">
             <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" oninput="calculateP2P('courseProfit')">
-            <span class="currency-symbol">$</span>
+            <span class="currency-symbol">₽</span>
           </div>
         </div>
         <div class="form-group">
@@ -629,7 +629,7 @@
 
     const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
     const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
-    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((sumUsdt + (sumUsdt * 0.06)) * sellRate) : 0;
+    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((profit*sellRate + (sumUsdt * (sellRate-buyRate))) ) : 0;
     courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
     if (source !== 'finalBalance') {
