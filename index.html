@@ -311,19 +311,19 @@
         <div class="form-group">
           <label for="p2pBuyRate">Курс покуп.</label>
           <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P()">
+            <input type="number" step="0.1" id="p2pBuyRate" value="88.5" oninput="calculateP2P('buyRate')">
           </div>
         </div>
         <div class="form-group">
           <label for="p2pSellRate">Курс продаж.</label>
           <div class="input-wrapper">
-            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P()">
+            <input type="number" step="0.1" id="p2pSellRate" value="92" oninput="calculateP2P('sellRate')">
           </div>
         </div>
         <div class="form-group">
           <label for="p2pBalance">Баланс USDT</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pBalance" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+            <input type="number" step="0.01" id="p2pBalance" placeholder="0" inputmode="numeric" oninput="calculateP2P('balance')">
           </div>
         </div>
       </div>
@@ -331,7 +331,7 @@
       <div class="form-group">
         <label for="p2pSumRub">Сумма в рублях</label>
         <div class="input-wrapper">
-          <input type="number" id="p2pSumRub" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+          <input type="number" id="p2pSumRub" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumRub')">
           <span class="currency-symbol">₽</span>
         </div>
       </div>
@@ -339,7 +339,7 @@
       <div class="form-group">
         <label for="p2pSumUsdt">Сумма в USDT</label>
         <div class="input-wrapper">
-          <input type="number" step="0.01" id="p2pSumUsdt" placeholder="0" inputmode="numeric" oninput="calculateP2P()">
+          <input type="number" step="0.01" id="p2pSumUsdt" placeholder="0" inputmode="numeric" oninput="calculateP2P('sumUsdt')">
           <span class="currency-symbol">$</span>
         </div>
       </div>
@@ -347,7 +347,7 @@
       <div class="form-group">
         <label for="p2pWillSettle">Спишется</label>
         <div class="input-wrapper">
-          <input type="number" step="0.01" id="p2pWillSettle" placeholder="0" readonly style="opacity: 0.8;">
+          <input type="number" step="0.01" id="p2pWillSettle" placeholder="0" oninput="calculateP2P('willSettle')">
           <span class="currency-symbol">$</span>
         </div>
       </div>
@@ -356,14 +356,14 @@
         <div class="form-group">
           <label for="p2pProfit">Прибыль (6%)</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pProfit" placeholder="0" readonly style="opacity: 0.8;">
+            <input type="number" step="0.01" id="p2pProfit" placeholder="0" oninput="calculateP2P('profit')">
             <span class="currency-symbol">$</span>
           </div>
         </div>
         <div class="form-group">
           <label for="p2pPartner">Партнерам (1.5%)</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pPartner" placeholder="0" readonly style="opacity: 0.8;">
+            <input type="number" step="0.01" id="p2pPartner" placeholder="0" oninput="calculateP2P('partner')">
             <span class="currency-symbol">$</span>
           </div>
         </div>
@@ -373,14 +373,14 @@
         <div class="form-group">
           <label for="p2pCourseProfit">Прибыль (курс)</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" readonly style="opacity: 0.8;">
+            <input type="number" step="0.01" id="p2pCourseProfit" placeholder="0" oninput="calculateP2P('courseProfit')">
             <span class="currency-symbol">$</span>
           </div>
         </div>
         <div class="form-group">
           <label for="p2pFinalBalance">Остаток на балансе</label>
           <div class="input-wrapper">
-            <input type="number" step="0.01" id="p2pFinalBalance" placeholder="0" readonly style="opacity: 0.8;">
+            <input type="number" step="0.01" id="p2pFinalBalance" placeholder="0" oninput="calculateP2P('finalBalance')">
             <span class="currency-symbol">$</span>
           </div>
         </div>
@@ -546,34 +546,91 @@
     }
   }
 
-  function calculateP2P() {
-    const buyRate = parseFloat(document.getElementById('p2pBuyRate').value) || 0;
-    const sellRate = parseFloat(document.getElementById('p2pSellRate').value) || 0;
-    const balance = parseFloat(document.getElementById('p2pBalance').value) || 0;
-    const sumRub = parseFloat(document.getElementById('p2pSumRub').value) || 0;
-    let sumUsdt = parseFloat(document.getElementById('p2pSumUsdt').value) || 0;
+  function calculateP2P(source) {
+    const buyRateEl = document.getElementById('p2pBuyRate');
+    const sellRateEl = document.getElementById('p2pSellRate');
+    const balanceEl = document.getElementById('p2pBalance');
+    const sumRubEl = document.getElementById('p2pSumRub');
+    const sumUsdtEl = document.getElementById('p2pSumUsdt');
+    const willSettleEl = document.getElementById('p2pWillSettle');
+    const profitEl = document.getElementById('p2pProfit');
+    const partnerEl = document.getElementById('p2pPartner');
+    const courseProfitEl = document.getElementById('p2pCourseProfit');
+    const finalBalanceEl = document.getElementById('p2pFinalBalance');
 
-    if (sumRub > 0 && sellRate > 0 && document.activeElement.id === 'p2pSumRub') {
-      sumUsdt = sumRub / sellRate;
-      document.getElementById('p2pSumUsdt').value = sumUsdt.toFixed(2);
+    let buyRate = parseFloat(buyRateEl.value) || 0;
+    let sellRate = parseFloat(sellRateEl.value) || 0;
+    let balance = parseFloat(balanceEl.value) || 0;
+    let sumRub = parseFloat(sumRubEl.value) || 0;
+    let sumUsdt = parseFloat(sumUsdtEl.value) || 0;
+    let willSettle = parseFloat(willSettleEl.value) || 0;
+    let profit = parseFloat(profitEl.value) || 0;
+    let partner = parseFloat(partnerEl.value) || 0;
+    let courseProfit = parseFloat(courseProfitEl.value) || 0;
+    let finalBalance = parseFloat(finalBalanceEl.value) || 0;
+
+    if (source === 'sumRub') {
+      sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
+      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+    } else if (source === 'sumUsdt') {
+      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
+      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+    } else if (source === 'willSettle') {
+      sumUsdt = willSettle > 0 ? willSettle / (1 - 0.075) : 0;
+      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
+      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+    } else if (source === 'profit') {
+      sumUsdt = profit > 0 ? profit / 0.06 : 0;
+      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
+      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+    } else if (source === 'partner') {
+      sumUsdt = partner > 0 ? partner / 0.015 : 0;
+      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+      sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
+      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+    } else if (source === 'sellRate') {
+      if (sumRub > 0) {
+        sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
+        sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
+      } else if (sumUsdt > 0) {
+        sumRub = sellRate > 0 ? sumUsdt * sellRate : 0;
+        sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+      }
+    } else if (source === 'finalBalance') {
+      balance = finalBalance - partner;
+      balanceEl.value = balance ? balance.toFixed(2) : '';
     }
 
-    const willSettle = sumUsdt > 0 ? sumUsdt - (sumUsdt * 0.075) : 0;
-    document.getElementById('p2pWillSettle').value = willSettle ? willSettle.toFixed(2) : '';
+    sumUsdt = parseFloat(sumUsdtEl.value) || 0;
+    sumRub = parseFloat(sumRubEl.value) || 0;
+    buyRate = parseFloat(buyRateEl.value) || 0;
+    sellRate = parseFloat(sellRateEl.value) || 0;
+    balance = parseFloat(balanceEl.value) || 0;
 
-    const profit = sumUsdt > 0 ? sumUsdt * 0.06 : 0;
-    document.getElementById('p2pProfit').value = profit ? profit.toFixed(2) : '';
+    if (source !== 'willSettle') {
+      willSettle = sumUsdt > 0 ? sumUsdt - (sumUsdt * 0.075) : 0;
+      willSettleEl.value = willSettle ? willSettle.toFixed(2) : '';
+    }
 
-    const partner = sumUsdt > 0 ? sumUsdt * 0.015 : 0;
-    document.getElementById('p2pPartner').value = partner ? partner.toFixed(2) : '';
+    if (source !== 'profit') {
+      profit = sumUsdt > 0 ? sumUsdt * 0.06 : 0;
+      profitEl.value = profit ? profit.toFixed(2) : '';
+    }
+
+    if (source !== 'partner') {
+      partner = sumUsdt > 0 ? sumUsdt * 0.015 : 0;
+      partnerEl.value = partner ? partner.toFixed(2) : '';
+    }
 
     const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
     const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
-    const courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? (buyUsdtValue - sellUsdtValue) : 0;
-    document.getElementById('p2pCourseProfit').value = courseProfit ? courseProfit.toFixed(2) : '';
+    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? (buyUsdtValue - sellUsdtValue) : 0;
+    courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
-    const finalBalance = balance + partner;
-    document.getElementById('p2pFinalBalance').value = finalBalance ? finalBalance.toFixed(2) : '';
+    finalBalance = balance + partner;
+    finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
   }
 </script>
 </body>
