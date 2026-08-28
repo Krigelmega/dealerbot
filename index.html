@@ -599,8 +599,11 @@
         sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
       }
     } else if (source === 'finalBalance') {
-      balance = finalBalance - partner;
-      balanceEl.value = balance ? balance.toFixed(2) : '';
+      finalBalance = parseFloat(finalBalanceEl.value) || 0;
+      sumRub = finalBalance;
+      sumRubEl.value = sumRub ? sumRub.toFixed(2) : '';
+      sumUsdt = sellRate > 0 ? sumRub / sellRate : 0;
+      sumUsdtEl.value = sumUsdt ? sumUsdt.toFixed(2) : '';
     }
 
     sumUsdt = parseFloat(sumUsdtEl.value) || 0;
@@ -624,13 +627,14 @@
       partnerEl.value = partner ? partner.toFixed(2) : '';
     }
 
-    const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
-    const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
-    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((sumUsdt + (sumUsdt * 0.06)) * sellRate) : 0;
+    const spreadPerUsdt = (sellRate > 0 && buyRate > 0) ? (sellRate - buyRate) : 0;
+    courseProfit = (sumUsdt > 0) ? profit + (sumUsdt * spreadPerUsdt) : 0;
     courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
 
-    finalBalance = balance + partner;
-    finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
+    if (source !== 'finalBalance') {
+      finalBalance = sumRub;
+      finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
+    }
   }
 </script>
 </body>
