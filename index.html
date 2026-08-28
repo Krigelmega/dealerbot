@@ -557,9 +557,18 @@
   // ============ КОНФИГУРАЦИЯ ============
   // Используем относительный путь - запросы будут идти на тот же домен
   const API_URL = ''; // Пустая строка = текущий домен
-  const AUTH_PASSWORD = "1234";
+  const AUTH_PASSWORD = "admin";
 
   // ============ АВТОРИЗАЦИЯ С WEBATHN ============
+
+  function base64ToUint8Array(base64) {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+}
   
   // Проверяем сессию
   async function checkSession() {
@@ -608,19 +617,9 @@
       }
       
       const options = await beginResponse.json();
-      
-      // Преобразуем challenge и user.id из base64 в ArrayBuffer
-      function base64ToUint8Array(base64) {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
-}
 
-options.challenge = base64ToUint8Array(options.challenge);
-options.user.id = base64ToUint8Array(options.user.id);
+      options.challenge = base64ToUint8Array(options.challenge);
+      options.user.id = base64ToUint8Array(options.user.id);
       
       // 2. Создаем ключ через WebAuthn (запускает Face ID)
       statusEl.textContent = '📱 Подтвердите Face ID...';
