@@ -1,6 +1,11 @@
-// functions/api/[[route]].js
+const store = {
+    challenges: {},    // { username: challenge }
+    users: {},         // { username: userData }
+    sessions: {}       // { token: username }
+};
+
 export async function onRequest(context) {
-    const { request, env } = context;
+    const { request } = context;
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -14,19 +19,17 @@ export async function onRequest(context) {
         return new Response(null, { headers: corsHeaders });
     }
 
-    // Добавьте этот лог для отладки
-    console.log('Request path:', path);
-    console.log('Request method:', request.method);
-
     // Регистрация - начало
     if (path === '/api/register/begin' && request.method === 'POST') {
         try {
             const { username } = await request.json();
             
+            // Генерируем challenge
             const challenge = new Uint8Array(32);
             crypto.getRandomValues(challenge);
             
-            await env.SESSION_STORE.put(`challenge:${username}`, btoa(String.fromCharCode(...challenge)), { expirationTtl: 300 });
+            // Сохраняем в памяти
+            store.challenges[username] = btoa(String.fromCharCode(...challenge));
             
             const options = {
                 challenge: btoa(String.fromCharCode(...challenge)),
@@ -35,7 +38,7 @@ export async function onRequest(context) {
                     id: url.hostname
                 },
                 user: {
-                    id: btoa(String.fromCharCode(...new TextEncoder().encode(username))),
+                    id: btoa(username),
                     name: username,
                     displayName: username
                 },
@@ -68,21 +71,22 @@ export async function onRequest(context) {
             const data = await request.json();
             const { username, id, response } = data;
             
-            const storedChallenge = await env.SESSION_STORE.get(`challenge:${username}`);
-            if (!storedChallenge) {
+            // Проверяем challenge
+            if (!store.challenges[username]) {
                 return new Response(JSON.stringify({ error: 'Challenge expired' }), {
                     status: 400,
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
                 });
             }
             
-            await env.SESSION_STORE.put(`user:${username}`, JSON.stringify({
+            // Сохраняем пользователя
+            store.users[username] = {
                 credentialId: id,
                 publicKey: response.attestationObject,
                 counter: 0
-            }));
+            };
             
-            await env.SESSION_STORE.delete(`challenge:${username}`);
+            delete store.challenges[username];
             
             return new Response(JSON.stringify({ success: true }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -99,27 +103,25 @@ export async function onRequest(context) {
     if (path === '/api/login/begin' && request.method === 'POST') {
         try {
             const { username } = await request.json();
-            const userData = await env.SESSION_STORE.get(`user:${username}`);
             
-            if (!userData) {
+            if (!store.users[username]) {
                 return new Response(JSON.stringify({ error: 'User not found' }), {
                     status: 404,
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
                 });
             }
             
-            const user = JSON.parse(userData);
             const challenge = new Uint8Array(32);
             crypto.getRandomValues(challenge);
             
-            await env.SESSION_STORE.put(`challenge:${username}`, btoa(String.fromCharCode(...challenge)), { expirationTtl: 300 });
+            store.challenges[username] = btoa(String.fromCharCode(...challenge));
             
             const options = {
                 challenge: btoa(String.fromCharCode(...challenge)),
                 rpId: url.hostname,
                 allowCredentials: [{
                     type: "public-key",
-                    id: user.credentialId
+                    id: store.users[username].credentialId
                 }],
                 userVerification: "required",
                 timeout: 60000
@@ -142,20 +144,20 @@ export async function onRequest(context) {
             const data = await request.json();
             const { username, id, response } = data;
             
-            const storedChallenge = await env.SESSION_STORE.get(`challenge:${username}`);
-            if (!storedChallenge) {
+            if (!store.challenges[username]) {
                 return new Response(JSON.stringify({ error: 'Challenge expired' }), {
                     status: 400,
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
                 });
             }
             
+            // Генерируем сессионный токен
             const sessionToken = new Uint8Array(32);
             crypto.getRandomValues(sessionToken);
             const token = btoa(String.fromCharCode(...sessionToken));
-            await env.SESSION_STORE.put(`session:${token}`, username, { expirationTtl: 86400 });
+            store.sessions[token] = username;
             
-            await env.SESSION_STORE.delete(`challenge:${username}`);
+            delete store.challenges[username];
             
             return new Response(JSON.stringify({ 
                 success: true, 
@@ -175,7 +177,7 @@ export async function onRequest(context) {
     if (path === '/api/check-session' && request.method === 'POST') {
         try {
             const { sessionToken } = await request.json();
-            const username = await env.SESSION_STORE.get(`session:${sessionToken}`);
+            const username = store.sessions[sessionToken];
             
             return new Response(JSON.stringify({ 
                 authenticated: !!username,
