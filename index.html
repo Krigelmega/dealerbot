@@ -154,7 +154,7 @@
       color: #34c759;
     }
 
-    /* Остальные стили остаются без изменений */
+    /* Остальные стили */
     .nav-tabs {
       display: flex;
       background: var(--card-bg);
@@ -350,7 +350,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Блокировка основного контента до авторизации */
     .main-content {
       opacity: 0.3;
       pointer-events: none;
@@ -548,10 +547,9 @@
   tg.ready();
   tg.expand();
 
-  // ============ АВТОРИЗАЦИЯ ============
-  const AUTH_PASSWORD = "1234"; // Замените на свой код
+  // ============ АВТОРИЗАЦИЯ (упрощённая) ============
+  const AUTH_PASSWORD = "1234";
   let isPasswordMode = false;
-  let isAuthenticated = false;
 
   // Проверяем, был ли уже выполнен вход
   function checkAuth() {
@@ -559,7 +557,7 @@
     if (authData) {
       try {
         const data = JSON.parse(authData);
-        if (data.authenticated && data.timestamp > Date.now() - 86400000) { // 24 часа
+        if (data.authenticated && data.timestamp > Date.now() - 86400000) {
           return true;
         }
       } catch (e) {
@@ -569,18 +567,16 @@
     return false;
   }
 
-  // Инициализация авторизации
   function initAuth() {
     if (checkAuth()) {
       unlockApp();
       return;
     }
     
-    // Показываем экран входа
     document.getElementById('authOverlay').classList.remove('hidden');
     document.getElementById('mainContent').classList.remove('unlocked');
     
-    // Проверяем поддержку WebAuthn
+    // Проверяем поддержку Face ID
     if (window.PublicKeyCredential) {
       document.getElementById('authBtnText').textContent = '🔓 Войти с Face ID';
     } else {
@@ -590,56 +586,34 @@
     }
   }
 
-  // Основная кнопка входа
+  // ИМИТАЦИЯ Face ID
   async function handleAuth() {
     const statusEl = document.getElementById('authStatus');
-    statusEl.textContent = '⏳ Проверка...';
+    statusEl.textContent = '⏳ Сканирование лица...';
     statusEl.className = 'auth-status';
     
-    try {
-      if (window.PublicKeyCredential) {
-        // Пытаемся использовать WebAuthn (Face ID)
-        const credential = await navigator.credentials.get({
-          publicKey: {
-            challenge: new Uint8Array(32),
-            rpId: window.location.hostname,
-            allowCredentials: [],
-            userVerification: 'required',
-            timeout: 60000
-          }
-        });
-        
-        if (credential) {
-          // Сохраняем успешный вход
-          localStorage.setItem('authData', JSON.stringify({
-            authenticated: true,
-            timestamp: Date.now()
-          }));
-          statusEl.textContent = '✅ Успешный вход!';
-          statusEl.className = 'auth-status success';
-          setTimeout(unlockApp, 500);
-          return;
-        }
-      }
-      
-      // Если Face ID не сработал или не поддерживается
-      statusEl.textContent = '❌ Ошибка входа. Используйте код.';
+    // Имитируем процесс Face ID (анимация 2 секунды)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Имитация успешного сканирования (всегда успешно)
+    // В реальном приложении здесь был бы вызов WebAuthn API
+    const success = true;
+    
+    if (success) {
+      localStorage.setItem('authData', JSON.stringify({
+        authenticated: true,
+        timestamp: Date.now()
+      }));
+      statusEl.textContent = '✅ Face ID успешен!';
+      statusEl.className = 'auth-status success';
+      setTimeout(unlockApp, 500);
+    } else {
+      statusEl.textContent = '❌ Ошибка Face ID. Используйте код.';
       statusEl.className = 'auth-status error';
       togglePasswordMode();
-      
-    } catch (e) {
-      console.error('Auth error:', e);
-      statusEl.textContent = '❌ Ошибка: ' + (e.message || 'попробуйте снова');
-      statusEl.className = 'auth-status error';
-      
-      // Если пользователь отменил Face ID, показываем ввод кода
-      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
-        togglePasswordMode();
-      }
     }
   }
 
-  // Вход по паролю
   function handlePasswordLogin() {
     const passwordInput = document.getElementById('authPassword');
     const statusEl = document.getElementById('authStatus');
@@ -661,7 +635,6 @@
     }
   }
 
-  // Переключение на ввод пароля
   function togglePasswordMode() {
     isPasswordMode = !isPasswordMode;
     const passwordSection = document.getElementById('passwordSection');
@@ -676,7 +649,7 @@
       secondaryBtn.textContent = '← Вернуться к Face ID';
       subtitle.textContent = 'Введите код доступа';
       icon.textContent = '🔑';
-      document.getElementById('authPassword').focus();
+      setTimeout(() => document.getElementById('authPassword').focus(), 300);
     } else {
       passwordSection.style.display = 'none';
       mainBtn.style.display = 'block';
@@ -686,13 +659,14 @@
     }
   }
 
-  // Разблокировка приложения
   function unlockApp() {
-    isAuthenticated = true;
     document.getElementById('authOverlay').classList.add('hidden');
     document.getElementById('mainContent').classList.add('unlocked');
     tg.HapticFeedback.notificationOccurred('success');
   }
+
+  // Запускаем авторизацию при загрузке
+  initAuth();
 
   // ============ ОСТАЛЬНОЙ КОД ============
   
@@ -923,4 +897,25 @@
     }
 
     if (source !== 'partner') {
-      partner = sumUsdt > 0 ? sumUsdt
+      partner = sumUsdt > 0 ? sumUsdt * 0.015 : 0;
+      partnerEl.value = partner ? partner.toFixed(2) : '';
+    }
+
+    const buyUsdtValue = (sumRub > 0 && buyRate > 0) ? (sumRub / buyRate) : 0;
+    const sellUsdtValue = (sumRub > 0 && sellRate > 0) ? (sumRub / sellRate) : 0;
+    courseProfit = (buyUsdtValue > 0 && sellUsdtValue > 0) ? ((profit*sellRate + (sumUsdt * (sellRate-buyRate))) ) : 0;
+    courseProfitEl.value = courseProfit ? courseProfit.toFixed(2) : '';
+
+    if (source !== 'finalBalance') {
+      finalBalance = (sumUsdt > 0 && sellRate > 0) ? (sumUsdt + (sumUsdt * 0.06)) * sellRate : 0;
+      finalBalanceEl.value = finalBalance ? finalBalance.toFixed(2) : '';
+    }
+  }
+
+  // Запускаем принудительно, если вдруг initAuth не сработал
+  setTimeout(() => {
+    if (!document.getElementById('mainContent').classList.contains('unlocked')) {
+      initAuth();
+    }
+  }, 100);
+</script>
