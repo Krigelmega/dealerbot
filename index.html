@@ -310,9 +310,9 @@
 <body>
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      <span class="auth-icon" id="authIcon">🔑</span>
+      <span class="auth-icon">🔑</span>
       <h2 class="auth-title">Вход в систему</h2>
-      <p class="auth-subtitle" id="authSubtitle">Введите код доступа</p>
+      <p class="auth-subtitle">Введите код доступа</p>
       <input type="password" class="auth-password-input" id="authPassword" placeholder="Введите код" maxlength="6" inputmode="numeric">
       <button class="auth-btn" onclick="handlePasswordLogin()">Войти</button>
       <div class="auth-status" id="authStatus"></div>
@@ -461,18 +461,16 @@
   tg.ready();
   tg.expand();
 
-  function d1(a){return String.fromCharCode(a-1)}
-  function d2(a,b){return a^b}
-  function d3(s){return s.split('').reverse().join('')}
-  function d4(s){return parseInt(s)}
+  function r(s){return s.split('').reverse().join('')}
+  function x(a,b){return a^b}
   
-  const _a=['Nzg3NA==','7874','4787','4473','1491','2209'];
+  const _0x=['Nzg3NA==','MjIwOQ=='];
   function getCode(){
-    let a=atob(_a[0]);
-    a=d3(a);
-    a=d4(a)-314;
+    let a=atob(_0x[0]);
+    a=r(a);
+    a=parseInt(a)-314;
     a=a/3;
-    a=d2(a,1234);
+    a=x(a,1234);
     return a.toString();
   }
   const CODE=getCode();
@@ -488,11 +486,11 @@
     const st=document.getElementById('authStatus');
     const val=inp.value.trim();
     if(val===CODE){
-      st.textContent='✅';
+      st.textContent='✅ Успешный вход!';
       st.className='auth-status success';
-      setTimeout(unlockApp,300);
+      setTimeout(unlockApp,500);
     }else{
-      st.textContent='❌';
+      st.textContent='❌ Неверный код!';
       st.className='auth-status error';
       inp.value='';
       inp.focus();
