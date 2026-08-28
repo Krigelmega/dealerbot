@@ -610,8 +610,17 @@
       const options = await beginResponse.json();
       
       // Преобразуем challenge и user.id из base64 в ArrayBuffer
-      options.challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
-      options.user.id = Uint8Array.from(atob(options.user.id), c => c.charCodeAt(0));
+      function base64ToUint8Array(base64) {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+}
+
+options.challenge = base64ToUint8Array(options.challenge);
+options.user.id = base64ToUint8Array(options.user.id);
       
       // 2. Создаем ключ через WebAuthn (запускает Face ID)
       statusEl.textContent = '📱 Подтвердите Face ID...';
@@ -696,11 +705,11 @@
     const options = await beginResponse.json();
     
     // Преобразуем challenge из base64
-    options.challenge = Uint8Array.from(atob(options.challenge), c => c.charCodeAt(0));
+    options.challenge = base64ToUint8Array(options.challenge);
     options.allowCredentials = options.allowCredentials.map(cred => ({
-      ...cred,
-      id: Uint8Array.from(atob(cred.id), c => c.charCodeAt(0))
-    }));
+    ...cred,
+    id: base64ToUint8Array(cred.id)
+}));
     
     // 2. Запрашиваем подтверждение через WebAuthn (запускает Face ID)
     statusEl.textContent = '📱 Подтвердите Face ID...';
